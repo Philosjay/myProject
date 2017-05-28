@@ -21,7 +21,7 @@ Game::Game()
 	mStatisticsText.setPosition(5.f, 5.f);
 	mStatisticsText.setCharacterSize(10);
 
-	TimePerFrame = sf::seconds(1.f / 60.f);
+	TimePerFrame = sf::seconds(60.f / 60.f);
 }
 void Game::run()
 {

@@ -88,7 +88,7 @@ sf::Keyboard::Key Player::getAssignedKey(Action action) const
 	return sf::Keyboard::Unknown;
 }
 
-void Player::initializeActions()
+void Player::initializeActions()		//载入函数，将commands与对应函数关联
 {
 	const float playerSpeed = 200.f;
 
