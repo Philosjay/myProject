@@ -5,10 +5,11 @@
 
 
 
-Game::Game() 
-	: mWindow(sf::VideoMode(640, 480), "F I G H T E R S", sf::Style::Close)
+Game::Game()
+	: mWindow(sf::VideoMode(640, 480), "F I G H T E R S")
 	, mWorld(mWindow)
 	, mFont()
+	, mMusics()
 	, mStatisticsText()
 	, mStatisticsUpdateTime()
 	, mStatisticsNumFrames(0)
@@ -21,7 +22,8 @@ Game::Game()
 	mStatisticsText.setPosition(5.f, 5.f);
 	mStatisticsText.setCharacterSize(10);
 
-	TimePerFrame = sf::seconds(60.f / 60.f);
+	TimePerFrame = sf::seconds(1.f / 60.f);
+	mMusics.play(Music::BattleTheme);
 }
 void Game::run()
 {
@@ -38,6 +40,7 @@ void Game::run()
 
 			processInput();
 			update(TimePerFrame);
+			
 		}
 
 		updateStatistics(elapsedTime);

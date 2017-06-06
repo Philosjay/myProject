@@ -19,14 +19,16 @@ class Player
 			MoveRight,
 			MoveUp,
 			MoveDown,
-			ActionCount
+			LaunchMissile,
+			Fire,
+			ActionCount,
 		};
 
 
 	public:
 								Player();
 
-		void					handleEvent(const sf::Event& event, CommandQueue& commands);
+								void					handleEvent(const sf::Event& event, CommandQueue& commands);
 		void					handleRealtimeInput(CommandQueue& commands);
 
 		void					assignKey(Action action, sf::Keyboard::Key key);

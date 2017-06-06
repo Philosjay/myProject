@@ -8,6 +8,7 @@
 #include "Aircraft.hpp"
 #include "Command.hpp"
 #include "CommandQueue.hpp"
+#include"SoundHolder.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
@@ -23,43 +24,92 @@ namespace sf
 
 class World : private sf::NonCopyable
 {
-	public:
-		explicit							World(sf::RenderWindow& window);
-		void								update(sf::Time dt);
-		void								draw();
-		CommandQueue&						getCommandQueue();
+public:
+	explicit							World(sf::RenderWindow& window);
+	void								update(sf::Time dt);
+	void								draw();
 
-	private:
-		void								loadTextures();
-		void								buildScene();
-		void								adaptPlayerPosition();
-		void								adaptPlayerVelocity();
+	CommandQueue&						getCommandQueue();
+
+	bool 								hasAlivePlayer() const;
+	bool 								hasPlayerReachedEnd() const;
 
 
-	private:
-		enum Layer
+private:
+	void								loadTextures();
+	void								adaptPlayerPosition();
+	void								handleCollisions();
+	void								randomEvents(sf::Time dt);
+	void								randomEnemys(sf::Time dt);
+
+	void								buildScene();
+	void								addEnemies();
+	void								addEnemy(Aircraft::Type type, float relX, float relY);
+	void								spawnEnemies();
+	void								destroyEntitiesOutsideView();
+	void								guideMissiles();
+	sf::FloatRect						getViewBounds() const;
+	sf::FloatRect						getBattlefieldBounds() const;
+
+
+private:
+	enum Layer
+	{
+		Background,
+		Air,
+		LayerCount
+	};
+
+	struct SpawnPoint
+	{
+		SpawnPoint(Aircraft::Type type, float x, float y)
+			: type(type)
+			, x(x)
+			, y(y)
 		{
-			Background,
-			Air,
-			LayerCount
-		};
+		}
+
+		Aircraft::Type type;
+		float x;
+		float y;
+	};
+
+	struct RandomEvents
+	{
+		RandomEvents(sf::Time RandomEnemyInterval, sf::Time RandomPickupInterval, sf::Time RandomEventsCountdown)
+			: RandomEnemyInterval(RandomEnemyInterval)
+			, RandomPickupInterval(RandomPickupInterval)
+			, RandomEventsCountdown(RandomEventsCountdown)
+		{
+		}
+
+		sf::Time RandomEnemyInterval;
+		sf::Time RandomPickupInterval;
+
+		sf::Time RandomEventsCountdown;
+	};
 
 
-	private:
-		sf::RenderWindow&					mWindow;
-		sf::View							mWorldView;
-		TextureHolder						mTextures;
+private:
+	sf::RenderWindow&					mWindow;
+	sf::View							mWorldView;
+	sf::Vector2f						mViewCenter;
+	TextureHolder						mTextures;
+	FontHolder&							mFonts;
+	SoundHolder							mSounds;
 
-		SceneNode							mSceneGraph;
-		std::array<SceneNode*, LayerCount>	mSceneLayers;
-		CommandQueue						mCommandQueue;
+	SceneNode							mSceneGraph;
+	std::array<SceneNode*, LayerCount>	mSceneLayers;
+	CommandQueue						mCommandQueue;
 
-		sf::FloatRect						mWorldBounds;
-		sf::Vector2f						mSpawnPosition;
-		float								mScrollSpeed;
-		Aircraft*							mPlayerAircraft;
+	sf::FloatRect						mWorldBounds;
+	sf::Vector2f						mSpawnPosition;
+	float								mScrollSpeed;
+	Aircraft*							mPlayerAircraft;
+	RandomEvents						mRandomEvents;
 
-		
+
+	std::vector<SpawnPoint>				mEnemySpawnPoints;
+	std::vector<Aircraft*>				mActiveEnemies;
 };
-
 #endif // BOOK_WORLD_HPP

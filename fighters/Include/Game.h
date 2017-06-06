@@ -7,6 +7,7 @@
 #include"SceneNode.hpp"
 #include"World.hpp"
 #include"Player.hpp"
+#include"MusicPlayer.h"
 
 class Game 
 {
@@ -17,24 +18,21 @@ public:
 private:        
 	void			processEvents();             
 	void			update(sf::Time deltaTime);
-	void					updateStatistics(sf::Time elapsedTime);
+	void			updateStatistics(sf::Time elapsedTime);
 	void			render();
 private:     
 	
 	sf::RenderWindow			 mWindow;     
 	World						 mWorld;
+	MusicPlayer				mMusics;
 	Player					mPlayer;
 	sf::Font				mFont;
 	sf::Text				mStatisticsText;
 	sf::Time				mStatisticsUpdateTime;
 	std::size_t				mStatisticsNumFrames;
 	sf::Time		  TimePerFrame;
-	
 
-	bool mIsMovingUp;
-	bool mIsMovingDown;
-	bool mIsMovingLeft;
-	bool mIsMovingRight;
+
 };
 
 
