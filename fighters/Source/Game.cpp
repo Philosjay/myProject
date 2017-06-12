@@ -7,12 +7,14 @@
 
 Game::Game()
 	: mWindow(sf::VideoMode(640, 480), "F I G H T E R S")
-	, mWorld(mWindow)
+	, mWorld(mWindow,&myScore,&myTime)
 	, mFont()
 	, mMusics()
 	, mStatisticsText()
 	, mStatisticsUpdateTime()
 	, mStatisticsNumFrames(0)
+	, myScore(0)
+	, myTime(sf::seconds(0))
 {
 	float x = mWindow.getSize().x;
 	x= mWindow.getSize().y;
@@ -20,7 +22,7 @@ Game::Game()
 	mFont.loadFromFile("Media/Sansation.ttf");
 	mStatisticsText.setFont(mFont);
 	mStatisticsText.setPosition(5.f, 5.f);
-	mStatisticsText.setCharacterSize(10);
+	mStatisticsText.setCharacterSize(30);
 
 	TimePerFrame = sf::seconds(1.f / 60.f);
 	mMusics.play(Music::BattleTheme);
@@ -80,7 +82,7 @@ void Game::render()
 }
 void Game::updateStatistics(sf::Time elapsedTime)
 {
-	mStatisticsUpdateTime += elapsedTime;
+/*	mStatisticsUpdateTime += elapsedTime;
 	mStatisticsNumFrames += 1;
 
 	if (mStatisticsUpdateTime >= sf::seconds(1.0f))
@@ -92,4 +94,10 @@ void Game::updateStatistics(sf::Time elapsedTime)
 		mStatisticsUpdateTime -= sf::seconds(1.0f);
 		mStatisticsNumFrames = 0;
 	}
+*/
+	myTime += elapsedTime;
+
+	mStatisticsText.setString("Score: " + toString(myScore));
+	
+
 }

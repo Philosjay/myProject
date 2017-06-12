@@ -9,6 +9,7 @@
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 #include"SoundHolder.hpp"
+#include"Bloom.h"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
@@ -25,7 +26,8 @@ namespace sf
 class World : private sf::NonCopyable
 {
 public:
-	explicit							World(sf::RenderWindow& window);
+
+	explicit							World(sf::RenderWindow& window,int* mScore, sf::Time* mTime);
 	void								update(sf::Time dt);
 	void								draw();
 
@@ -50,7 +52,9 @@ private:
 	void								guideMissiles();
 	sf::FloatRect						getViewBounds() const;
 	sf::FloatRect						getBattlefieldBounds() const;
-
+	void								updateScore(Aircraft& mAircraft);
+	void								addAlly();
+	void								addBloom(float x, float y);
 
 private:
 	enum Layer
@@ -106,10 +110,18 @@ private:
 	sf::Vector2f						mSpawnPosition;
 	float								mScrollSpeed;
 	Aircraft*							mPlayerAircraft;
+	SceneNode*                          mPlayer;
 	RandomEvents						mRandomEvents;
 
-
+	std::unique_ptr<Aircraft>   	    mAllies[2];
 	std::vector<SpawnPoint>				mEnemySpawnPoints;
 	std::vector<Aircraft*>				mActiveEnemies;
+
+	int*								mScore;
+	sf::Time*							mTime;
+	SceneNode							mBloom;
+	Bloom*								bloom;
+	sf::Sprite							bm;
+
 };
 #endif // BOOK_WORLD_HPP

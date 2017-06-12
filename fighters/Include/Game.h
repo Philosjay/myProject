@@ -24,13 +24,16 @@ private:
 	
 	sf::RenderWindow			 mWindow;     
 	World						 mWorld;
-	MusicPlayer				mMusics;
-	Player					mPlayer;
-	sf::Font				mFont;
-	sf::Text				mStatisticsText;
-	sf::Time				mStatisticsUpdateTime;
-	std::size_t				mStatisticsNumFrames;
-	sf::Time		  TimePerFrame;
+	MusicPlayer					mMusics;
+	Player						mPlayer;
+	sf::Font					mFont;
+	sf::Text					mStatisticsText;
+	sf::Time					mStatisticsUpdateTime;
+	std::size_t					mStatisticsNumFrames;
+	sf::Time					TimePerFrame;
+
+	int							myScore;
+	sf::Time					myTime;
 
 
 };

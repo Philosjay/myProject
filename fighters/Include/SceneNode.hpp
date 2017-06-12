@@ -19,6 +19,7 @@ class CommandQueue;
 class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
 {
 public:
+	friend  class Aircraft;
 	typedef std::unique_ptr<SceneNode> Ptr;
 	typedef std::pair<SceneNode*, SceneNode*> Pair;
 
@@ -56,9 +57,11 @@ private:
 
 
 private:
-	std::vector<Ptr>		mChildren;
+
 	SceneNode*				mParent;
 	Category::Type			mDefaultCategory;
+public:
+	std::vector<Ptr>		mChildren;
 };
 
 bool	collision(const SceneNode& lhs, const SceneNode& rhs);

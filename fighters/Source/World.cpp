@@ -3,13 +3,14 @@
 #include "Include\Foreach.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
 bool matchesCategories(SceneNode::Pair& colliders, Category::Type type1, Category::Type type2);
 
-World::World(sf::RenderWindow& window)
+World::World(sf::RenderWindow& window,int* mScore,sf::Time* mTime)
 	: mWindow(window)
 	, mWorldView(window.getDefaultView())
 	, mFonts(mFonts)
@@ -23,8 +24,14 @@ World::World(sf::RenderWindow& window)
 	, mScrollSpeed(-50.f)
 	, mPlayerAircraft(nullptr)
 	, mEnemySpawnPoints()
+	, mAllies()
 	, mActiveEnemies()
 	, mRandomEvents(sf::seconds(5), sf::seconds(10), sf::seconds(0))
+	, mScore(mScore)
+	, mTime(mTime)
+	, mPlayer(mPlayerAircraft)
+	, mBloom()
+	, bloom(NULL)
 {
 	loadTextures();
 	buildScene();
@@ -36,12 +43,14 @@ World::World(sf::RenderWindow& window)
 void World::update(sf::Time dt)
 {
 
+
 	// Scroll the world, reset player velocity
 	mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
 	mViewCenter.y -= mScrollSpeed * dt.asSeconds();
 	randomEvents(dt);
 
 	mPlayerAircraft->setVelocity(0.f, 0.f);
+	
 
 	// Setup commands to destroy entities, and guide missiles
 	destroyEntitiesOutsideView();
@@ -69,12 +78,20 @@ void World::update(sf::Time dt)
 
 	adaptPlayerPosition();
 	mSounds.emptyQueue();
+
+	mBloom.update()
+
+
+	
 }
 
 void World::draw()
 {
 	mWindow.setView(mWorldView);
 	mWindow.draw(mSceneGraph);
+
+	mWindow.draw(mBloom);
+
 }
 
 CommandQueue& World::getCommandQueue()
@@ -106,6 +123,9 @@ void World::loadTextures()
 	mTextures.load(Textures::MissileRefill, "Media/Textures/MissileRefill.png");
 	mTextures.load(Textures::FireSpread, "Media/Textures/FireSpread.png");
 	mTextures.load(Textures::FireRate, "Media/Textures/FireRate.png");
+
+	mTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
+	bm.setTexture(mTextures.get(Textures::Explosion));
 }
 
 void World::adaptPlayerPosition()
@@ -177,6 +197,7 @@ void World::buildScene()
 
 	// Add enemy aircraft
 	addEnemies();
+
 }
 
 void World::addEnemies()
@@ -321,6 +342,14 @@ void World::handleCollisions()
 			// Collision: Player damage = enemy's remaining HP
 			player.damage(enemy.getHitpoints());
 			enemy.destroy();
+
+			updateScore(enemy);
+
+			if (player.getHitpoints() <= 0)
+			{
+				addBloom(player.getPosition().x, player.getPosition().y);
+			}
+			
 		}
 /*
 		else if (matchesCategories(pair, Category::PlayerAircraft, Category::Pickup))
@@ -343,6 +372,9 @@ void World::handleCollisions()
 			aircraft.damage(projectile.getDamage());
 			projectile.destroy();
 			mSounds.play(SoundEffect::Explosion1);
+			
+
+			updateScore(aircraft);
 		}
 	}
 }
@@ -357,9 +389,77 @@ void World::randomEnemys(sf::Time dt)
 	mRandomEvents.RandomEventsCountdown += dt;
 	if (mRandomEvents.RandomEventsCountdown > mRandomEvents.RandomEnemyInterval)
 	{
-		addEnemy(Aircraft::Avenger, rand()%600-200, mViewCenter.y+300);
+		if (rand() % 2 == 1)
+		{
+			addEnemy(Aircraft::Avenger, rand() % 600 - 200, mViewCenter.y + 300);
+		}
+		else
+		{
+			addEnemy(Aircraft::Raptor, rand() % 500 - 150, mViewCenter.y + 300);
+		}
+		
 
 		mRandomEvents.RandomEventsCountdown -= mRandomEvents.RandomEnemyInterval;
 	}
 }
 
+void World::updateScore(Aircraft& mAircraft)
+{
+	if (!mAircraft.isAllied() && mAircraft.isDestroyed())
+	{
+		switch (mAircraft.getType())
+		{
+		case Aircraft::Type::Raptor:
+			*mScore += 50;
+			break;
+		case Aircraft::Type::Avenger:
+			*mScore += 100;
+			break;
+		case Aircraft::Type::Eagle:
+			*mScore += 150;
+			break;
+		}
+		addBloom(mAircraft.getPosition().x, mAircraft.getPosition().y);
+	}
+
+}
+
+void World::addAlly()
+{
+/*
+	static int Allies = 0;
+
+	if (*mTime > sf::seconds(5)&&Allies<1)
+	{
+		std::unique_ptr<Aircraft> t;
+		std::unique_ptr<Aircraft> Ally(new Aircraft(Aircraft::Type::Eagle, mTextures, mFonts, mSounds));
+		Ally->setPosition(-50, -50);
+		mPlayerAircraft->attachChild(std::move(Ally));
+		t.reset();
+//		mAllies[Allies].reset(t);
+		Allies++;
+
+	}
+*/
+
+	
+		
+}
+
+void World :: addBloom(float x,float y)
+{
+	sf::Texture& texture = mTextures.get(Textures::Explosion);
+	std::unique_ptr<Bloom> mbloom(new Bloom(texture));
+	mbloom->setPosition(x, y);
+
+/*
+	sf::Texture& texture = mTextures.get(Textures::Explosion);
+	std::unique_ptr<SpriteNode> mbloom(new SpriteNode(texture));
+	mbloom->setPosition(x,y);
+*/
+
+	mBloom.attachChild(std::move(mbloom));
+
+
+
+}

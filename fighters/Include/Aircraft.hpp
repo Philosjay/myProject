@@ -30,6 +30,7 @@ public:
 	Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds);
 
 	virtual unsigned int	getCategory() const;
+	Aircraft::Type			getType() const;
 	virtual sf::FloatRect	getBoundingRect() const;
 	virtual bool 			isMarkedForRemoval() const;
 	bool					isAllied() const;
@@ -51,7 +52,7 @@ private:
 
 	void					createBullets(SceneNode& node, const TextureHolder& textures) const;
 	void					createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, const TextureHolder& textures) const;
-
+	void					setAllyVelocity(float x, float y);
 
 private:
 	Type					mType;

@@ -85,6 +85,19 @@ unsigned int Aircraft::getCategory() const
 		return Category::EnemyAircraft;
 }
 
+Aircraft::Type Aircraft::getType() const
+{
+	switch (mType)
+	{
+	case Type::Raptor:
+		return Type::Raptor;
+	case Type::Avenger:
+		return Type::Avenger;
+	case Type::Eagle:
+		return Type::Eagle;
+	}
+}
+
 sf::FloatRect Aircraft::getBoundingRect() const
 {
 	return getWorldTransform().transformRect(mSprite.getGlobalBounds());
@@ -247,3 +260,7 @@ void Aircraft::createProjectile(SceneNode& node, Projectile::Type type, float xO
 	node.attachChild(std::move(projectile));
 }
 
+void Aircraft::setAllyVelocity(float x,float y)
+{
+//	this->mch
+}

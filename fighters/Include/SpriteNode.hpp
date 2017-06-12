@@ -21,4 +21,5 @@ class SpriteNode : public SceneNode
 		sf::Sprite			mSprite;
 };
 
+
 #endif // BOOK_SPRITENODE_HPP
