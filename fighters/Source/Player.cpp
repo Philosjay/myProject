@@ -34,6 +34,12 @@ Player::Player()
 	mKeyBinding[sf::Keyboard::S] = MoveDown;
 	mKeyBinding[sf::Keyboard::Space] = Fire;
 	mKeyBinding[sf::Keyboard::M] = LaunchMissile;
+	mKeyBinding[sf::Keyboard::Q] = GetMissile;
+	mKeyBinding[sf::Keyboard::E] = UpgradeFire;
+	mKeyBinding[sf::Keyboard::R] = GetAlly;
+	mKeyBinding[sf::Keyboard::Num1] = Continue;
+	mKeyBinding[sf::Keyboard::Num2] = Restart;
+	mKeyBinding[sf::Keyboard::Num3] = Exit;
 
 	// Set initial action bindings
 	initializeActions();
@@ -47,7 +53,7 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 {
 	if (event.type == sf::Event::KeyPressed)
 	{
-		// Check if pressed key appears in key binding, trigger command if so
+		// Check if pressed key appears in key binding, trigger command if so, 若按键被绑定了事件，将该事件压入待执行事件队列
 		auto found = mKeyBinding.find(event.key.code);
 		if (found != mKeyBinding.end() && !isRealtimeAction(found->second))
 			commands.push(mActionBinding[found->second]);
@@ -100,6 +106,10 @@ void Player::initializeActions()		//载入函数，将commands与对应函数关联
 	mActionBinding[MoveDown].action = derivedAction<Aircraft>(AircraftMover(0, +1));
 	mActionBinding[Fire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.fire(); });
 	mActionBinding[LaunchMissile].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.launchMissile(); });
+
+	mActionBinding[GetMissile].action = derivedAction<Aircraft>([](Aircraft& a,sf::Time) {a.getMissile(); });
+	mActionBinding[UpgradeFire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.increaseFireRate(); });
+
 }
 
 bool Player::isRealtimeAction(Action action)

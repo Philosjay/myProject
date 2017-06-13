@@ -31,9 +31,12 @@ public:
 	Ptr						detachChild(const SceneNode& node);
 
 	void					update(sf::Time dt, CommandQueue& commands);
+	void					update(sf::Time dt);
+	virtual void			updateBloom(sf::Time dt);
+	virtual bool			toRemove();
 
 	sf::Vector2f			getWorldPosition() const;
-	sf::Transform			getWorldTransform() const;
+	sf::Transform			getWorldTransform() const; 
 
 	void					onCommand(const Command& command, sf::Time dt);		//执行对应指令
 	virtual unsigned int	getCategory() const;
@@ -41,9 +44,11 @@ public:
 	void					checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& collisionPairs);
 	void					checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs);
 	void					removeWrecks();
+	void					removeBlooms();
 	virtual sf::FloatRect	getBoundingRect() const;
 	virtual bool			isMarkedForRemoval() const;
 	virtual bool			isDestroyed() const;
+	virtual bool			toRemove()const;
 
 
 private:

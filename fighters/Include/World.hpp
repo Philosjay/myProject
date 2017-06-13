@@ -27,7 +27,7 @@ class World : private sf::NonCopyable
 {
 public:
 
-	explicit							World(sf::RenderWindow& window,int* mScore, sf::Time* mTime);
+	explicit							World(sf::RenderWindow& window,int* mScore, sf::Time* mTime,bool& isPlayerAlive);
 	void								update(sf::Time dt);
 	void								draw();
 
@@ -111,6 +111,7 @@ private:
 	float								mScrollSpeed;
 	Aircraft*							mPlayerAircraft;
 	SceneNode*                          mPlayer;
+	bool&								isPlayerAlive;
 	RandomEvents						mRandomEvents;
 
 	std::unique_ptr<Aircraft>   	    mAllies[2];
@@ -119,8 +120,8 @@ private:
 
 	int*								mScore;
 	sf::Time*							mTime;
-	SceneNode							mBloom;
-	Bloom*								bloom;
+	SceneNode							mBloomNode;
+	Bloom*								mBloom;
 	sf::Sprite							bm;
 
 };

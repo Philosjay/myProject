@@ -21,7 +21,7 @@ private:
 	void			updateStatistics(sf::Time elapsedTime);
 	void			render();
 private:     
-	
+	bool						isPlayerAlive;
 	sf::RenderWindow			 mWindow;     
 	World						 mWorld;
 	MusicPlayer					mMusics;
@@ -31,6 +31,7 @@ private:
 	sf::Time					mStatisticsUpdateTime;
 	std::size_t					mStatisticsNumFrames;
 	sf::Time					TimePerFrame;
+
 
 	int							myScore;
 	sf::Time					myTime;

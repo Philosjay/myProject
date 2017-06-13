@@ -21,6 +21,12 @@ class Player
 			MoveDown,
 			LaunchMissile,
 			Fire,
+			UpgradeFire,
+			GetMissile,
+			GetAlly,
+			Restart,
+			Continue,
+			Exit,
 			ActionCount,
 		};
 

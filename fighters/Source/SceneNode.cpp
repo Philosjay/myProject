@@ -3,6 +3,7 @@
 #include"Include\Command.hpp"
 #include"Include\utility.hpp"
 
+
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
@@ -50,6 +51,23 @@ void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
 {
 	FOREACH(Ptr& child, mChildren)
 		child->update(dt, commands);
+}
+
+void SceneNode::update(sf::Time dt)
+{
+	FOREACH(Ptr& child, mChildren)
+		child->updateBloom(dt);
+
+}
+
+void SceneNode::updateBloom(sf::Time dt)
+{
+//
+}
+
+bool SceneNode::toRemove()
+{
+	return false;
 }
 
 void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -148,6 +166,19 @@ void SceneNode::removeWrecks()
 	std::for_each(mChildren.begin(), mChildren.end(), std::mem_fn(&SceneNode::removeWrecks));
 }
 
+void SceneNode::removeBlooms()
+{
+
+	FOREACH(Ptr& child, mChildren)
+	{
+		if (child->toRemove())
+		{
+			this->detachChild(*child);
+		}
+	}
+
+}
+
 sf::FloatRect SceneNode::getBoundingRect() const
 {
 	return sf::FloatRect();
@@ -162,6 +193,11 @@ bool SceneNode::isMarkedForRemoval() const
 bool SceneNode::isDestroyed() const
 {
 	// By default, scene node needn't be removed
+	return false;
+}
+
+bool SceneNode::toRemove()const
+{
 	return false;
 }
 

@@ -10,7 +10,7 @@
 
 bool matchesCategories(SceneNode::Pair& colliders, Category::Type type1, Category::Type type2);
 
-World::World(sf::RenderWindow& window,int* mScore,sf::Time* mTime)
+World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPlayerAlive)
 	: mWindow(window)
 	, mWorldView(window.getDefaultView())
 	, mFonts(mFonts)
@@ -30,8 +30,9 @@ World::World(sf::RenderWindow& window,int* mScore,sf::Time* mTime)
 	, mScore(mScore)
 	, mTime(mTime)
 	, mPlayer(mPlayerAircraft)
-	, mBloom()
-	, bloom(NULL)
+	, mBloomNode()
+	, mBloom(NULL)
+	, isPlayerAlive(isPlayerAlive)
 {
 	loadTextures();
 	buildScene();
@@ -79,7 +80,10 @@ void World::update(sf::Time dt)
 	adaptPlayerPosition();
 	mSounds.emptyQueue();
 
-	mBloom.update()
+
+	mBloomNode.update(dt);
+//	mBloomNode.removeBlooms();
+
 
 
 	
@@ -90,7 +94,7 @@ void World::draw()
 	mWindow.setView(mWorldView);
 	mWindow.draw(mSceneGraph);
 
-	mWindow.draw(mBloom);
+	mWindow.draw(mBloomNode);
 
 }
 
@@ -332,7 +336,7 @@ void World::handleCollisions()
 	std::set<SceneNode::Pair> collisionPairs;
 	mSceneGraph.checkSceneCollision(mSceneGraph, collisionPairs);
 
-	FOREACH(SceneNode::Pair pair, collisionPairs)
+	FOREACH(SceneNode::Pair pair, collisionPairs)		//·É»úÅö×²
 	{
 		if (matchesCategories(pair, Category::PlayerAircraft, Category::EnemyAircraft))
 		{
@@ -376,6 +380,11 @@ void World::handleCollisions()
 
 			updateScore(aircraft);
 		}
+	}
+	if (mPlayerAircraft->getHitpoints() <= 0 && isPlayerAlive)
+	{
+		isPlayerAlive = false;
+		addBloom(mPlayerAircraft->getPosition().x, mPlayerAircraft->getPosition().y);
 	}
 }
 
@@ -458,7 +467,7 @@ void World :: addBloom(float x,float y)
 	mbloom->setPosition(x,y);
 */
 
-	mBloom.attachChild(std::move(mbloom));
+	mBloomNode.attachChild(std::move(mbloom));
 
 
 

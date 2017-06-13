@@ -6,8 +6,8 @@
 
 
 Game::Game()
-	: mWindow(sf::VideoMode(640, 480), "F I G H T E R S")
-	, mWorld(mWindow,&myScore,&myTime)
+	: mWindow(sf::VideoMode(640, 600), "F I G H T E R S")
+	, mWorld(mWindow,&myScore,&myTime,isPlayerAlive)
 	, mFont()
 	, mMusics()
 	, mStatisticsText()
@@ -15,9 +15,8 @@ Game::Game()
 	, mStatisticsNumFrames(0)
 	, myScore(0)
 	, myTime(sf::seconds(0))
+	, isPlayerAlive(true)
 {
-	float x = mWindow.getSize().x;
-	x= mWindow.getSize().y;
 
 	mFont.loadFromFile("Media/Sansation.ttf");
 	mStatisticsText.setFont(mFont);
@@ -41,7 +40,11 @@ void Game::run()
 			timeSinceLastUpdate -= TimePerFrame;
 
 			processInput();
-			update(TimePerFrame);
+			if (isPlayerAlive)
+			{
+				update(TimePerFrame);
+			}
+			
 			
 		}
 

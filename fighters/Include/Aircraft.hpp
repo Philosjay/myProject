@@ -38,6 +38,7 @@ public:
 
 	void					increaseFireRate();
 	void					increaseSpread();
+	void					getMissile();
 	void					collectMissiles(unsigned int count);
 
 	void 					fire();
@@ -69,6 +70,7 @@ private:
 	int						mFireRateLevel;
 	int						mSpreadLevel;
 	int						mMissileAmmo;
+	int						mPoints;
 
 	Command 				mDropPickupCommand;
 	float					mTravelledDistance;

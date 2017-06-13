@@ -28,6 +28,7 @@ Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& f
 	, mDropPickupCommand()
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
+	, mPoints(100)
 {
 	centerOrigin(mSprite);
 
@@ -120,8 +121,13 @@ float Aircraft::getMaxSpeed() const
 
 void Aircraft::increaseFireRate()
 {
-	if (mFireRateLevel < 10)
-		++mFireRateLevel;
+	if (mPoints - 7 >= 0)
+	{
+		if (mFireRateLevel < 10)
+			++mFireRateLevel;
+		mPoints -= 7;
+	}
+
 }
 
 void Aircraft::increaseSpread()
@@ -264,3 +270,14 @@ void Aircraft::setAllyVelocity(float x,float y)
 {
 //	this->mch
 }
+
+void Aircraft::getMissile()
+{
+	if (mPoints - 1 >= 0)
+	{
+		mPoints -= 1;
+		mMissileAmmo++;
+	}
+
+}
+	
