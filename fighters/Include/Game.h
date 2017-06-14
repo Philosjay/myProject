@@ -22,8 +22,8 @@ private:
 	void			render();
 private:     
 	bool						isPlayerAlive;
-	sf::RenderWindow			 mWindow;     
-	World						 mWorld;
+	sf::RenderWindow			mWindow;     
+	World						mWorld;
 	MusicPlayer					mMusics;
 	Player						mPlayer;
 	sf::Font					mFont;

@@ -11,7 +11,7 @@ namespace
 	const std::vector<AircraftData> Table = initializeAircraftData();
 }
 
-Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts,SoundHolder& mSounds)
+Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts,SoundHolder& mSounds, bool isPlayer)
 	: Entity(Table[type].hitpoints)
 	, mType(type)
 	, mSprite(textures.get(Table[type].texture))
@@ -29,6 +29,10 @@ Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& f
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
 	, mPoints(100)
+	, isQMEnuOpened(false)
+	, isEMenuOpened(false)
+	, mWindow(window)
+	, isPlayerAircraft(isPlayer)
 {
 	centerOrigin(mSprite);
 
@@ -43,21 +47,37 @@ Aircraft::Aircraft(Type type, const TextureHolder& textures, const FontHolder& f
 	{
 		createProjectile(node, Projectile::Missile, 0.f, 0.5f, textures);
 	};
-
-	mDropPickupCommand.category = Category::SceneAirLayer;
-	mDropPickupCommand.action = [this, &textures](SceneNode& node, sf::Time)
+	if (isPlayerAircraft)
 	{
-//		createPickup(node, textures);
-	};
+		mFont.loadFromFile("Media/Sansation.ttf");
+		mPointsText.setFont(mFont);
+		mPointsText.setCharacterSize(15);
+
+		EMenuTexture.loadFromFile("Media/Textures/EMenu.png");
+		EMenu.setTexture(EMenuTexture);
+
+		QMenuTexture.loadFromFile("Media/Textures/QMenu.png");
+		QMenu.setTexture(QMenuTexture);
+	}
+
 }
 
 void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
+	if (isPlayerAircraft&&(isEMenuOpened||isQMEnuOpened))
+	{
+		if(isEMenuOpened)mWindow.draw(EMenu);
+		else mWindow.draw(QMenu);
+		
+		mWindow.draw(mPointsText);
+	}
+
 	target.draw(mSprite, states);
 }
 
 void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
+
 	// Entity has been destroyed: Possibly drop pickup, mark for removal
 	if (isDestroyed())
 	{
@@ -76,6 +96,19 @@ void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 	// Update texts
 //	updateTexts();
+	if (isPlayerAircraft)
+	{
+		sf::Color color;
+		mPointsText.setPosition(getPosition().x-60, getPosition().y+60);
+		mPointsText.setString("HP:"+toString(getHitpoints())+ "      Points:" + toString(mPoints)+"\n"+"        Missiles:"+toString(mMissileAmmo));
+		
+		
+		mPointsText.setFillColor(color.Red);
+
+		EMenu.setPosition(getPosition().x+10 , getPosition().y-100);
+		QMenu.setPosition(getPosition().x-200, getPosition().y - 100);
+	}
+
 }
 
 unsigned int Aircraft::getCategory() const
@@ -271,13 +304,67 @@ void Aircraft::setAllyVelocity(float x,float y)
 //	this->mch
 }
 
-void Aircraft::getMissile()
+void Aircraft::GetMissileORUpgradeFire()
 {
-	if (mPoints - 1 >= 0)
+	if (isEMenuOpened)
 	{
-		mPoints -= 1;
-		mMissileAmmo++;
+		if (mPoints - 2 >= 0)
+		{
+			mPoints -= 2;
+			mMissileAmmo++;
+			mSounds.play(SoundEffect::Purchase);
+		}
 	}
-
+	else if (isQMEnuOpened)
+	{
+		if (mPoints - 15 >= 0)
+		{
+			mPoints -= 15;
+			increaseFireRate();
+			mSounds.play(SoundEffect::Upgrade);
+		}
+	}
 }
-	
+
+void Aircraft::GetHpOrGetAlly()
+{
+	if (isEMenuOpened)
+	{
+		if (mPoints - 5 >= 0)
+		{
+			repair(20);
+			mPoints -= 5;
+			mSounds.play(SoundEffect::Purchase);
+		}
+	}
+	else if (isQMEnuOpened)
+	{
+		if (mPoints - 15 >= 0)
+		{
+			mPoints -= 10;
+			increaseSpread();
+			mSounds.play(SoundEffect::Upgrade);
+		}
+	}
+}
+
+void Aircraft::openEMenu()
+{
+	if(!isQMEnuOpened)  isEMenuOpened = true;
+}
+
+void Aircraft::openQMenu()
+{
+	if(!isEMenuOpened)	isQMEnuOpened = true;
+}
+
+void Aircraft::closeMenu()
+{
+	isQMEnuOpened = false;
+	isEMenuOpened = false;
+}
+
+void Aircraft::addPoints(int points)
+{
+	mPoints += points;
+}

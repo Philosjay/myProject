@@ -40,6 +40,7 @@ int Entity::getHitpoints() const
 	return mHitpoints;
 }
 
+
 void Entity::repair(int points)
 {
 	//	assert(points > 0);

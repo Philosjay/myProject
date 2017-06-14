@@ -21,6 +21,8 @@ namespace SoundEffect
 		LaunchMissile,
 		CollectPickup,
 		Button,
+		Upgrade,
+		Purchase,
 	};
 }
 

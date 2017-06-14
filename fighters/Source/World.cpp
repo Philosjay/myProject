@@ -44,6 +44,7 @@ World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPla
 void World::update(sf::Time dt)
 {
 
+//	mPlayerAircraft->resetMenu();
 
 	// Scroll the world, reset player velocity
 	mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
@@ -51,6 +52,7 @@ void World::update(sf::Time dt)
 	randomEvents(dt);
 
 	mPlayerAircraft->setVelocity(0.f, 0.f);
+
 	
 
 	// Setup commands to destroy entities, and guide missiles
@@ -194,7 +196,7 @@ void World::buildScene()
 	mSceneLayers[Background]->attachChild(std::move(backgroundSprite));
 
 	// Add player's aircraft
-	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mTextures, mFonts,mSounds));
+	std::unique_ptr<Aircraft> player(new Aircraft(mWindow,Aircraft::Eagle, mTextures, mFonts,mSounds,true));
 	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
 	mSceneLayers[Air]->attachChild(std::move(player));
@@ -211,26 +213,69 @@ void World::addEnemies()
 	addEnemy(Aircraft::Raptor, 0.f, 700.f);
 	addEnemy(Aircraft::Raptor, 0.f, 700.f);
 	addEnemy(Aircraft::Raptor, 0.f, 1000.f);
-	addEnemy(Aircraft::Raptor, +100.f, 1100.f);
-	addEnemy(Aircraft::Raptor, -100.f, 1100.f);
-	addEnemy(Aircraft::Avenger, -70.f, 1400.f);
-	addEnemy(Aircraft::Avenger, -70.f, 1600.f);
-	addEnemy(Aircraft::Avenger, 70.f, 1400.f);
-	addEnemy(Aircraft::Avenger, 70.f, 1600.f);
+//	addEnemy(Aircraft::Raptor, +100.f, 1500.f);
+//	addEnemy(Aircraft::Raptor, -100.f, 1500.f);
+//	addEnemy(Aircraft::Avenger, -70.f, 1800.f);
+//	addEnemy(Aircraft::Avenger, -70.f, 2000.f);
+//	addEnemy(Aircraft::Avenger, 70.f, 1400.f);
+//	addEnemy(Aircraft::Avenger, 70.f, 1600.f);
+
+	addTroopA(2000);
+	addTroopB(2000);
 
 	addEnemy(Aircraft::Raptor, +300.f, 2000.f);
 	addEnemy(Aircraft::Raptor, -300.f, 2000.f);
 	addEnemy(Aircraft::Raptor, 0.f, 2100.f);
-	addEnemy(Aircraft::Avenger, +70.f, 2500.f);
-	addEnemy(Aircraft::Avenger, -70.f, 2500.f);
-	addEnemy(Aircraft::Avenger, +140.f, 2600.f);
-	addEnemy(Aircraft::Avenger, -140.f, 2600.f);
+
+	addEnemy(Aircraft::Raptor, +200.f, 2300.f);
+	addEnemy(Aircraft::Raptor, -200.f, 2300.f);
+	addEnemy(Aircraft::Raptor, 0.f, 2500.f);
+	addEnemy(Aircraft::Raptor, +400.f, 2700.f);
+	addEnemy(Aircraft::Raptor, -400.f, 2700.f);
+	addEnemy(Aircraft::Raptor, 0.f, 2900.f);
+
+	addEnemy(Aircraft::Avenger, +70.f, 3500.f);
+	addEnemy(Aircraft::Avenger, -70.f, 3500.f);
+	addEnemy(Aircraft::Avenger, +140.f, 3600.f);
+	addEnemy(Aircraft::Avenger, -140.f, 3600.f);
 
 	// Sort all enemies according to their y value, such that lower enemies are checked first for spawning
 	std::sort(mEnemySpawnPoints.begin(), mEnemySpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)
 	{
 		return lhs.y < rhs.y;
 	});
+}
+
+void World::addTroopA()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		addEnemy(Aircraft::RaptorTroopA,100+i*30, mViewCenter.y + 500+i*20);
+	}
+}
+
+void World::addTroopB()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		addEnemy(Aircraft::RaptorTroopB, -100 - i * 30, mViewCenter.y + 500 + i * 20);
+	}
+}
+
+void World::addTroopA(float y)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		addEnemy(Aircraft::RaptorTroopA, 100 + i * 30, y + i * 20);
+	}
+}
+
+void World::addTroopB(float y)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		addEnemy(Aircraft::RaptorTroopB, -100 - i * 30, y + i * 20);
+	}
 }
 
 void World::addEnemy(Aircraft::Type type, float relX, float relY)
@@ -247,7 +292,7 @@ void World::spawnEnemies()
 	{
 		SpawnPoint spawn = mEnemySpawnPoints.back();
 
-		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.type, mTextures, mFonts,mSounds));
+		std::unique_ptr<Aircraft> enemy(new Aircraft(mWindow,spawn.type, mTextures, mFonts,mSounds,false));
 		enemy->setPosition(spawn.x, spawn.y);
 		enemy->setRotation(180.f);
 
@@ -325,8 +370,8 @@ sf::FloatRect World::getBattlefieldBounds() const
 {
 	// Return view bounds + some area at top, where enemies spawn
 	sf::FloatRect bounds = getViewBounds();
-	bounds.top -= 50.f;
-	bounds.height += 50.f;
+	bounds.top -= 100.f;
+	bounds.height += 100.f;
 
 	return bounds;
 }
@@ -398,13 +443,13 @@ void World::randomEnemys(sf::Time dt)
 	mRandomEvents.RandomEventsCountdown += dt;
 	if (mRandomEvents.RandomEventsCountdown > mRandomEvents.RandomEnemyInterval)
 	{
-		if (rand() % 2 == 1)
+		if (rand() % 3 == 1)
 		{
-			addEnemy(Aircraft::Avenger, rand() % 600 - 200, mViewCenter.y + 300);
+			addEnemy(Aircraft::Avenger, rand() % 600 - 300, mViewCenter.y + 500);
 		}
 		else
 		{
-			addEnemy(Aircraft::Raptor, rand() % 500 - 150, mViewCenter.y + 300);
+			addEnemy(Aircraft::Raptor, rand() % 600 - 300, mViewCenter.y + 500);
 		}
 		
 
@@ -420,12 +465,15 @@ void World::updateScore(Aircraft& mAircraft)
 		{
 		case Aircraft::Type::Raptor:
 			*mScore += 50;
+			mPlayerAircraft->addPoints(1);
 			break;
 		case Aircraft::Type::Avenger:
 			*mScore += 100;
+			mPlayerAircraft->addPoints(4);
 			break;
 		case Aircraft::Type::Eagle:
 			*mScore += 150;
+			mPlayerAircraft->addPoints(7);
 			break;
 		}
 		addBloom(mAircraft.getPosition().x, mAircraft.getPosition().y);

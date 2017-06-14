@@ -46,6 +46,10 @@ private:
 
 	void								buildScene();
 	void								addEnemies();
+	void								addTroopA();		//基于当前位置
+	void								addTroopB();
+	void								addTroopA(float y);	//基于预设坐标
+	void								addTroopB(float y);
 	void								addEnemy(Aircraft::Type type, float relX, float relY);
 	void								spawnEnemies();
 	void								destroyEntitiesOutsideView();

@@ -9,8 +9,7 @@
 #include "Command.hpp"
 #include"CommandQueue.hpp"
 
-
-#include <SFML/Graphics/Sprite.hpp>
+#include<SFML/Graphics.hpp>
 
 
 
@@ -22,13 +21,15 @@ public:
 		Eagle,
 		Raptor,
 		Avenger,
-		TypeCount
+
+		RaptorTroopA,
+		RaptorTroopB,
+		TypeCount,
 	};
 
 
 public:
-	Aircraft(Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds);
-
+	Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds,bool isPlayer);
 	virtual unsigned int	getCategory() const;
 	Aircraft::Type			getType() const;
 	virtual sf::FloatRect	getBoundingRect() const;
@@ -38,11 +39,18 @@ public:
 
 	void					increaseFireRate();
 	void					increaseSpread();
-	void					getMissile();
+	void					GetMissileORUpgradeFire();
+	void					GetHpOrGetAlly();
 	void					collectMissiles(unsigned int count);
 
 	void 					fire();
 	void					launchMissile();
+
+	void					openEMenu();
+	void					openQMenu();
+
+	void					closeMenu();
+	void					addPoints(int points);
 
 
 private:
@@ -66,6 +74,7 @@ private:
 	bool 					mIsFiring;
 	bool					mIsLaunchingMissile;
 	bool 					mIsMarkedForRemoval;
+	bool					isPlayerAircraft;
 
 	int						mFireRateLevel;
 	int						mSpreadLevel;
@@ -75,6 +84,17 @@ private:
 	Command 				mDropPickupCommand;
 	float					mTravelledDistance;
 	std::size_t				mDirectionIndex;
+	bool					isQMEnuOpened;
+	bool					isEMenuOpened;
+
+	sf::Font				mFont;
+	sf::Text				mPointsText;
+	sf::RenderWindow&       mWindow;
+
+	sf::Sprite				EMenu;
+	sf::Sprite				QMenu;
+	sf::Texture				EMenuTexture;
+	sf::Texture				QMenuTexture;
 
 };
 

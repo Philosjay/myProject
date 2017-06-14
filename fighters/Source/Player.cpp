@@ -32,11 +32,13 @@ Player::Player()
 	mKeyBinding[sf::Keyboard::D] = MoveRight;
 	mKeyBinding[sf::Keyboard::W] = MoveUp;
 	mKeyBinding[sf::Keyboard::S] = MoveDown;
-	mKeyBinding[sf::Keyboard::Space] = Fire;
-	mKeyBinding[sf::Keyboard::M] = LaunchMissile;
-	mKeyBinding[sf::Keyboard::Q] = GetMissile;
-	mKeyBinding[sf::Keyboard::E] = UpgradeFire;
-	mKeyBinding[sf::Keyboard::R] = GetAlly;
+	mKeyBinding[sf::Keyboard::Up] = Fire;
+	mKeyBinding[sf::Keyboard::Space ] = LaunchMissile;
+	mKeyBinding[sf::Keyboard::Q] = QMenu;
+	mKeyBinding[sf::Keyboard::E] = EMenu,
+	mKeyBinding[sf::Keyboard::Right] = GetMissileORUpgradeFire;		//设法给一个键绑定两个功能
+	mKeyBinding[sf::Keyboard::Left] = GetHpOrGetAlly;
+	mKeyBinding[sf::Keyboard::Down] = CloseMenu;
 	mKeyBinding[sf::Keyboard::Num1] = Continue;
 	mKeyBinding[sf::Keyboard::Num2] = Restart;
 	mKeyBinding[sf::Keyboard::Num3] = Exit;
@@ -107,8 +109,11 @@ void Player::initializeActions()		//载入函数，将commands与对应函数关联
 	mActionBinding[Fire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.fire(); });
 	mActionBinding[LaunchMissile].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) { a.launchMissile(); });
 
-	mActionBinding[GetMissile].action = derivedAction<Aircraft>([](Aircraft& a,sf::Time) {a.getMissile(); });
-	mActionBinding[UpgradeFire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.increaseFireRate(); });
+	mActionBinding[EMenu].action = derivedAction<Aircraft>([](Aircraft& a,sf::Time) {a.openEMenu(); });
+	mActionBinding[QMenu].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.openQMenu(); });
+	mActionBinding[CloseMenu].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.closeMenu(); });
+	mActionBinding[GetMissileORUpgradeFire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetMissileORUpgradeFire(); });
+	mActionBinding[GetHpOrGetAlly].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetHpOrGetAlly(); });
 
 }
 
@@ -121,6 +126,9 @@ bool Player::isRealtimeAction(Action action)
 	case MoveDown:
 	case MoveUp:
 	case Fire:
+	case EMenu:
+	case QMenu:
+//	case GetMissileANDUpgradeFire:
 		return true;
 
 	default:

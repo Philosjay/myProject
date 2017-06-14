@@ -33,6 +33,19 @@ std::vector<AircraftData> initializeAircraftData()
 	data[Aircraft::Avenger].directions.push_back(Direction(+45.f,  50.f));
 	data[Aircraft::Avenger].fireInterval = sf::seconds(2);
 
+
+	data[Aircraft::RaptorTroopA].hitpoints = 20;
+	data[Aircraft::RaptorTroopA].speed = 80.f;
+	data[Aircraft::RaptorTroopA].texture = Textures::Raptor;
+	data[Aircraft::RaptorTroopA].directions.push_back(Direction(+45.f, 500.f));
+	data[Aircraft::RaptorTroopA].fireInterval = sf::Time::Zero;
+
+	data[Aircraft::RaptorTroopB].hitpoints = 20;
+	data[Aircraft::RaptorTroopB].speed = 80.f;
+	data[Aircraft::RaptorTroopB].texture = Textures::Raptor;
+	data[Aircraft::RaptorTroopB].directions.push_back(Direction(-45.f, 500.f));
+	data[Aircraft::RaptorTroopB].fireInterval = sf::Time::Zero;
+
 	return data;
 }
 
@@ -49,7 +62,7 @@ std::vector<ProjectileData> initializeProjectileData()
 	data[Projectile::EnemyBullet].texture = Textures::Bullet;
 
 	data[Projectile::Missile].damage = 200;
-	data[Projectile::Missile].speed = 150.f;
+	data[Projectile::Missile].speed = 300.f;
 	data[Projectile::Missile].texture = Textures::Missile;
 
 	return data;
