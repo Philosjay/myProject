@@ -25,7 +25,7 @@ class Player
 			QMenu,
 			CloseMenu,
 			GetMissileORUpgradeFire,
-			GetHpOrGetAlly,
+			GetHpOrFirePile,
 			Restart,
 			Continue,
 			Exit,

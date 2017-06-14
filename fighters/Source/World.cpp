@@ -141,10 +141,10 @@ void World::adaptPlayerPosition()
 	const float borderDistance = 40.f;
 
 	sf::Vector2f position = mPlayerAircraft->getPosition();
-	position.x = std::max(position.x, viewBounds.left + borderDistance);
-	position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
+	position.x = std::max(position.x, viewBounds.left + borderDistance-30);
+	position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance+30);
 	position.y = std::max(position.y, viewBounds.top + borderDistance);
-	position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
+	position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance+10);
 	mPlayerAircraft->setPosition(position);
 }
 
@@ -464,6 +464,8 @@ void World::updateScore(Aircraft& mAircraft)
 		switch (mAircraft.getType())
 		{
 		case Aircraft::Type::Raptor:
+		case Aircraft::Type::RaptorTroopA:
+		case Aircraft::Type::RaptorTroopB:
 			*mScore += 50;
 			mPlayerAircraft->addPoints(1);
 			break;

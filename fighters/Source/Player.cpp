@@ -37,7 +37,7 @@ Player::Player()
 	mKeyBinding[sf::Keyboard::Q] = QMenu;
 	mKeyBinding[sf::Keyboard::E] = EMenu,
 	mKeyBinding[sf::Keyboard::Right] = GetMissileORUpgradeFire;		//设法给一个键绑定两个功能
-	mKeyBinding[sf::Keyboard::Left] = GetHpOrGetAlly;
+	mKeyBinding[sf::Keyboard::Left] = GetHpOrFirePile;
 	mKeyBinding[sf::Keyboard::Down] = CloseMenu;
 	mKeyBinding[sf::Keyboard::Num1] = Continue;
 	mKeyBinding[sf::Keyboard::Num2] = Restart;
@@ -113,7 +113,7 @@ void Player::initializeActions()		//载入函数，将commands与对应函数关联
 	mActionBinding[QMenu].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.openQMenu(); });
 	mActionBinding[CloseMenu].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.closeMenu(); });
 	mActionBinding[GetMissileORUpgradeFire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetMissileORUpgradeFire(); });
-	mActionBinding[GetHpOrGetAlly].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetHpOrGetAlly(); });
+	mActionBinding[GetHpOrFirePile].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetHpOrFirePile(); });
 
 }
 

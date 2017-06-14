@@ -3,6 +3,7 @@
 #include "Include\Datatables.hpp"
 #include"Include\utility.hpp"
 
+
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
@@ -28,11 +29,11 @@ Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& tex
 	, mDropPickupCommand()
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
-	, mPoints(100)
-	, isQMEnuOpened(false)
-	, isEMenuOpened(false)
-	, mWindow(window)
+	, mPoints(1000)
 	, isPlayerAircraft(isPlayer)
+	, mMenu(window)
+	, FireRateCost(10)
+	, FireSpreadCost(15)
 {
 	centerOrigin(mSprite);
 
@@ -47,29 +48,14 @@ Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& tex
 	{
 		createProjectile(node, Projectile::Missile, 0.f, 0.5f, textures);
 	};
-	if (isPlayerAircraft)
-	{
-		mFont.loadFromFile("Media/Sansation.ttf");
-		mPointsText.setFont(mFont);
-		mPointsText.setCharacterSize(15);
-
-		EMenuTexture.loadFromFile("Media/Textures/EMenu.png");
-		EMenu.setTexture(EMenuTexture);
-
-		QMenuTexture.loadFromFile("Media/Textures/QMenu.png");
-		QMenu.setTexture(QMenuTexture);
-	}
 
 }
 
 void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	if (isPlayerAircraft&&(isEMenuOpened||isQMEnuOpened))
+	if (isPlayerAircraft)
 	{
-		if(isEMenuOpened)mWindow.draw(EMenu);
-		else mWindow.draw(QMenu);
-		
-		mWindow.draw(mPointsText);
+		mMenu.showMenu();
 	}
 
 	target.draw(mSprite, states);
@@ -98,15 +84,8 @@ void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 //	updateTexts();
 	if (isPlayerAircraft)
 	{
-		sf::Color color;
-		mPointsText.setPosition(getPosition().x-60, getPosition().y+60);
-		mPointsText.setString("HP:"+toString(getHitpoints())+ "      Points:" + toString(mPoints)+"\n"+"        Missiles:"+toString(mMissileAmmo));
-		
-		
-		mPointsText.setFillColor(color.Red);
+		mMenu.updateMenu(getPosition(), getHitpoints(), mPoints, mMissileAmmo,FireRateCost,FireSpreadCost);
 
-		EMenu.setPosition(getPosition().x+10 , getPosition().y-100);
-		QMenu.setPosition(getPosition().x-200, getPosition().y - 100);
 	}
 
 }
@@ -152,21 +131,27 @@ float Aircraft::getMaxSpeed() const
 	return Table[mType].speed;
 }
 
-void Aircraft::increaseFireRate()
+bool Aircraft::increaseFireRate()
 {
-	if (mPoints - 7 >= 0)
+	if (mFireRateLevel < 7)
 	{
-		if (mFireRateLevel < 10)
-			++mFireRateLevel;
-		mPoints -= 7;
+		++mFireRateLevel;
+		return true;
 	}
+	return false;
 
 }
 
-void Aircraft::increaseSpread()
+bool Aircraft::increaseSpread()
 {
-	if (mSpreadLevel < 3)
-		++mSpreadLevel;
+	if (mSpreadLevel < 4)
+	{
+		++mSpreadLevel;;
+		return true;
+	}
+	return false;
+
+
 }
 
 void Aircraft::collectMissiles(unsigned int count)
@@ -179,6 +164,11 @@ void Aircraft::fire()
 	// Only ships with fire interval != 0 are able to fire
 	if (Table[mType].fireInterval != sf::Time::Zero)
 		mIsFiring = true;
+
+	if (isPlayerAircraft)
+	{
+		mMenu.closeMenus();
+	}
 }
 
 void Aircraft::launchMissile()
@@ -187,6 +177,11 @@ void Aircraft::launchMissile()
 	{
 		mIsLaunchingMissile = true;
 		--mMissileAmmo;
+
+		if (isPlayerAircraft)
+		{
+			mMenu.closeMenus();
+		}
 	}
 }
 
@@ -283,6 +278,13 @@ void Aircraft::createBullets(SceneNode& node, const TextureHolder& textures) con
 		createProjectile(node, type, 0.0f, 0.5f, textures);
 		createProjectile(node, type, +0.5f, 0.33f, textures);
 		break;
+	case 4:
+		createProjectile(node, type, -0.55f, 0.33f, textures);
+		createProjectile(node, type, -0.17f, 0.55f, textures);
+		createProjectile(node, type, +0.17f, 0.55f, textures);
+		createProjectile(node, type, +0.55f, 0.33f, textures);
+
+
 	}
 }
 
@@ -306,29 +308,34 @@ void Aircraft::setAllyVelocity(float x,float y)
 
 void Aircraft::GetMissileORUpgradeFire()
 {
-	if (isEMenuOpened)
+	if (mMenu.isEOpened())
 	{
-		if (mPoints - 2 >= 0)
+		if (mPoints - 2 >= 0 && mMissileAmmo < 4)
 		{
 			mPoints -= 2;
 			mMissileAmmo++;
 			mSounds.play(SoundEffect::Purchase);
 		}
 	}
-	else if (isQMEnuOpened)
+	else if (mMenu.isQOpened())
 	{
-		if (mPoints - 15 >= 0)
+		if (mPoints - FireRateCost >= 0)
 		{
-			mPoints -= 15;
-			increaseFireRate();
-			mSounds.play(SoundEffect::Upgrade);
+			
+			if (increaseFireRate())
+			{
+				mPoints -= FireRateCost;
+				mSounds.play(SoundEffect::Upgrade);
+				FireRateCost = FireRateCost / 5 + 3 + FireRateCost;		//升级所需点数增加
+			}
+				
 		}
 	}
 }
 
-void Aircraft::GetHpOrGetAlly()
+void Aircraft::GetHpOrFirePile()
 {
-	if (isEMenuOpened)
+	if (mMenu.isEOpened())
 	{
 		if (mPoints - 5 >= 0)
 		{
@@ -337,31 +344,35 @@ void Aircraft::GetHpOrGetAlly()
 			mSounds.play(SoundEffect::Purchase);
 		}
 	}
-	else if (isQMEnuOpened)
+	else if (mMenu.isQOpened())
 	{
-		if (mPoints - 15 >= 0)
+		if (mPoints - FireSpreadCost >= 0)
 		{
-			mPoints -= 10;
-			increaseSpread();
-			mSounds.play(SoundEffect::Upgrade);
+			
+			if (increaseSpread())
+			{
+				mPoints -= FireSpreadCost;
+				mSounds.play(SoundEffect::Upgrade);
+				FireSpreadCost = FireSpreadCost / 5 + 4 + FireSpreadCost;
+			}
+				
 		}
 	}
 }
 
 void Aircraft::openEMenu()
 {
-	if(!isQMEnuOpened)  isEMenuOpened = true;
+	if (!mMenu.isQOpened()) mMenu.openMenu(PlayerStatusMenu::Menus::EMenu);
 }
 
 void Aircraft::openQMenu()
 {
-	if(!isEMenuOpened)	isQMEnuOpened = true;
+	if (!mMenu.isEOpened()) mMenu.openMenu(PlayerStatusMenu::Menus::QMenu);
 }
 
 void Aircraft::closeMenu()
 {
-	isQMEnuOpened = false;
-	isEMenuOpened = false;
+	mMenu.closeMenus();
 }
 
 void Aircraft::addPoints(int points)

@@ -8,6 +8,7 @@
 #include"SoundHolder.hpp"
 #include "Command.hpp"
 #include"CommandQueue.hpp"
+#include "PlayerStatusMenu.h"
 
 #include<SFML/Graphics.hpp>
 
@@ -37,10 +38,10 @@ public:
 	bool					isAllied() const;
 	float					getMaxSpeed() const;
 
-	void					increaseFireRate();
-	void					increaseSpread();
+	bool					increaseFireRate();
+	bool					increaseSpread();
 	void					GetMissileORUpgradeFire();
-	void					GetHpOrGetAlly();
+	void					GetHpOrFirePile();
 	void					collectMissiles(unsigned int count);
 
 	void 					fire();
@@ -81,20 +82,15 @@ private:
 	int						mMissileAmmo;
 	int						mPoints;
 
+	int						FireRateCost;
+	int						FireSpreadCost;
+
 	Command 				mDropPickupCommand;
 	float					mTravelledDistance;
 	std::size_t				mDirectionIndex;
-	bool					isQMEnuOpened;
-	bool					isEMenuOpened;
 
-	sf::Font				mFont;
-	sf::Text				mPointsText;
-	sf::RenderWindow&       mWindow;
 
-	sf::Sprite				EMenu;
-	sf::Sprite				QMenu;
-	sf::Texture				EMenuTexture;
-	sf::Texture				QMenuTexture;
+	PlayerStatusMenu		mMenu;
 
 };
 
