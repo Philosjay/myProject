@@ -1,5 +1,6 @@
 #include"Include\PlayerStatusMenu.h"
 #include"Include\stringhelpers.hpp"
+#include"Include\Aircraft.hpp"
 
 PlayerStatusMenu::PlayerStatusMenu(sf::RenderWindow& window)
 	:mWindow(window)
@@ -242,7 +243,7 @@ void PlayerStatusMenu::updateTextsColor(int HP, int points, int missiles, int fi
 void PlayerStatusMenu::updateRings(sf::Vector2f position, int fireRateCost, int fireSpreadCost)
 {
 	static int preFireSpread;
-	if (fireSpreadCost != 15)
+	if (fireSpreadCost != 15)	//15是初始cost
 	{
 		if (fireSpreadCost != preFireSpread)
 		{
@@ -256,7 +257,7 @@ void PlayerStatusMenu::updateRings(sf::Vector2f position, int fireRateCost, int 
 	preFireSpread = fireSpreadCost;
 
 	static int preFireRate;
-	if (fireRateCost != 10)
+	if (fireRateCost != 10)		//10是初始cost
 	{
 		if (fireRateCost != preFireRate)
 		{

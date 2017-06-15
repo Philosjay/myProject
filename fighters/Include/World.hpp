@@ -11,6 +11,7 @@
 #include"SoundHolder.hpp"
 #include"Bloom.h"
 
+
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -23,11 +24,13 @@ namespace sf
 	class RenderWindow;
 }
 
+class Player;
+
 class World : private sf::NonCopyable
 {
 public:
 
-	explicit							World(sf::RenderWindow& window,int* mScore, sf::Time* mTime,bool& isPlayerAlive);
+	explicit							World(sf::RenderWindow& window,int& mScore, sf::Time* mTime, Player* player);
 	void								update(sf::Time dt);
 	void								draw();
 
@@ -35,7 +38,7 @@ public:
 
 	bool 								hasAlivePlayer() const;
 	bool 								hasPlayerReachedEnd() const;
-
+	sf::Vector2f						getViewCenter();
 
 private:
 	void								loadTextures();
@@ -43,13 +46,29 @@ private:
 	void								handleCollisions();
 	void								randomEvents(sf::Time dt);
 	void								randomEnemys(sf::Time dt);
+	void								randomTroop(sf::Time dt);
 
 	void								buildScene();
 	void								addEnemies();
-	void								addTroopA();		//基于当前位置
-	void								addTroopB();
-	void								addTroopA(float y);	//基于预设坐标
-	void								addTroopB(float y);
+
+																//基于当前位置
+	void								addTroopA1();		
+	void								addTroopA2();
+	void								addTroopB1();
+	void								addTroopB2();
+	void								addTroopC1();
+	void								addTroopC2();
+	void								addTroopD1();
+
+																//基于预设坐标
+	void								addTroopA1(float y);		//一列raptor
+	void								addTroopA2(float y);
+	void								addTroopB1(float y);		//2 raptor + 1 avenger
+	void								addTroopB2(float y);
+	void								addTroopC1(float y);		//3 raptor + 3 avenger
+	void								addTroopC2(float y);
+
+
 	void								addEnemy(Aircraft::Type type, float relX, float relY);
 	void								spawnEnemies();
 	void								destroyEntitiesOutsideView();
@@ -59,6 +78,7 @@ private:
 	void								updateScore(Aircraft& mAircraft);
 	void								addAlly();
 	void								addBloom(float x, float y);
+
 
 private:
 	enum Layer
@@ -114,19 +134,18 @@ private:
 	sf::Vector2f						mSpawnPosition;
 	float								mScrollSpeed;
 	Aircraft*							mPlayerAircraft;
-	SceneNode*                          mPlayer;
-	bool&								isPlayerAlive;
 	RandomEvents						mRandomEvents;
 
 	std::unique_ptr<Aircraft>   	    mAllies[2];
 	std::vector<SpawnPoint>				mEnemySpawnPoints;
 	std::vector<Aircraft*>				mActiveEnemies;
 
-	int*								mScore;
+	int&								mScore;
 	sf::Time*							mTime;
 	SceneNode							mBloomNode;
-	Bloom*								mBloom;
+//	Bloom*								mBloom;
 	sf::Sprite							bm;
+	Player*								mPlayer;
 
 };
 #endif // BOOK_WORLD_HPP

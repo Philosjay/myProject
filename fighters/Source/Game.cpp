@@ -7,15 +7,15 @@
 
 Game::Game()
 	: mWindow(sf::VideoMode(640, 600), "F I G H T E R S")
-	, mWorld(mWindow,&myScore,&myTime,isPlayerAlive)
+	, mWorld(mWindow,myScore,&myTime,&mPlayer)
 	, mFont()
-	, mMusics()
 	, mStatisticsText()
 	, mStatisticsUpdateTime()
 	, mStatisticsNumFrames(0)
 	, myScore(0)
 	, myTime(sf::seconds(0))
-	, isPlayerAlive(true)
+	, isPaused(false)
+	, isStarted(false)
 {
 
 	mFont.loadFromFile("Media/Sansation.ttf");
@@ -24,42 +24,75 @@ Game::Game()
 	mStatisticsText.setCharacterSize(30);
 
 	TimePerFrame = sf::seconds(1.f / 60.f);
-	mMusics.play(Music::BattleTheme);
+
+
+	pauseTexture.loadFromFile("Media/Textures/pause.png");
+	pauseSprite.setTexture(pauseTexture);
+	pauseSprite.setPosition(210, 100);
+
+	Intro1.loadFromFile("Media/Textures/intro1.png");
+	Intro2.loadFromFile("Media/Textures/intro2.png");
+	Intro3.loadFromFile("Media/Textures/intro3.png");
+	Intro4.loadFromFile("Media/Textures/intro4.png");
+	Intro5.loadFromFile("Media/Textures/intro5.png");
+
+	introSprite.setTexture(Intro1);
+	introSprite.setPosition(0, 0);
 }
 void Game::run()
 {
-	sf::Clock clock;
+	IntroTheme.play(Music::IntroTheme);
+//	sf::Clock									clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 
 	while (mWindow.isOpen())
 	{
-		sf::Time elapsedTime = clock.restart();
-		timeSinceLastUpdate += elapsedTime;
-		while (timeSinceLastUpdate > TimePerFrame)
-		{
-			timeSinceLastUpdate -= TimePerFrame;
 
-			processInput();
-			if (isPlayerAlive)
+		if (isStarted)
+		{
+			sf::Time elapsedTime = clock.restart();
+			timeSinceLastUpdate += elapsedTime;
+
+			while (timeSinceLastUpdate > TimePerFrame)
 			{
-				update(TimePerFrame);
+				timeSinceLastUpdate -= TimePerFrame;
+				if (!isPaused)
+				{
+					processInput();
+					update(TimePerFrame);
+				}
+				handlePlayerOption();
 			}
-			
-			
+
+			updateStatistics(elapsedTime);
+		}
+		else
+		{
+			handlePlayerOption();
 		}
 
-		updateStatistics(elapsedTime);
 		render();
 	}
 }
 
 void Game::processInput()
 {
+
 	CommandQueue& commands = mWorld.getCommandQueue();
 
 	sf::Event event;
 	while (mWindow.pollEvent(event))
 	{
+		switch (event.type)
+		{
+		case sf::Event::KeyPressed:
+			handlePlayerInput(event.key.code, true);
+			break;
+		case sf::Event::Closed:
+			mWindow.close();
+			break;
+		}
+
 		mPlayer.handleEvent(event, commands);
 
 		if (event.type == sf::Event::Closed)
@@ -75,32 +108,118 @@ void Game::update(sf::Time deltaTime)
 	mWorld.update(deltaTime);
 }
 void Game::render()
-{
+{		
+
 	mWindow.clear();	
 	mWorld.draw();
 
 	mWindow.setView(mWindow.getDefaultView());
 	mWindow.draw(mStatisticsText);
+	if (isPaused)
+	{
+		mWindow.draw(pauseSprite);
+	}
+	if (!isStarted)
+	{
+		mWindow.draw(introSprite);
+	}
+
+
 	mWindow.display();
+
+
 }
 void Game::updateStatistics(sf::Time elapsedTime)
 {
-/*	mStatisticsUpdateTime += elapsedTime;
-	mStatisticsNumFrames += 1;
-
-	if (mStatisticsUpdateTime >= sf::seconds(1.0f))
-	{
-		mStatisticsText.setString(
-			"Frames / Second = " + toString(mStatisticsNumFrames) + "\n" +
-			"Time / Update = " + toString(mStatisticsUpdateTime.asMicroseconds() / mStatisticsNumFrames) + "us");
-
-		mStatisticsUpdateTime -= sf::seconds(1.0f);
-		mStatisticsNumFrames = 0;
-	}
-*/
 	myTime += elapsedTime;
 
 	mStatisticsText.setString("Score: " + toString(myScore));
 	
+	static bool wasAlive = true;
+	static bool toDefeat = true;
 
+	if (mPlayer.isPlayerAlive()!=wasAlive)
+	{
+		if (toDefeat)
+		{
+			BattleTheme.setPaused(true);
+			DefeatedTheme.play(Music::DefeatedTheme);
+			toDefeat = false;
+		}
+		else
+		{
+			BattleTheme.setPaused(false);
+			DefeatedTheme.stop();
+			toDefeat = true;
+		}
+
+	}
+
+	wasAlive = mPlayer.isPlayerAlive();
+	
+}
+
+void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
+{
+	if (key == sf::Keyboard::Escape)
+	{
+		if (isPaused)
+		{
+			isPaused = false;
+			BattleTheme.setPaused(false);
+			PauseTheme.stop();
+		}
+		else
+		{
+			isPaused = true;
+			BattleTheme.setPaused(true);
+			PauseTheme.play(Music::PauseTheme);
+		}
+	}
+	else if (key == sf::Keyboard::Q&&!isStarted)
+	{
+		introCount = 2;
+		introSprite.setTexture(Intro2);
+	}
+	else if (key == sf::Keyboard::Down && !isStarted&&(introCount==2))
+	{
+		introCount = 3;
+		introSprite.setTexture(Intro3);
+	}
+	else if (key == sf::Keyboard::E && !isStarted && (introCount == 3))
+	{
+		introCount = 4;
+		introSprite.setTexture(Intro4);
+
+	}
+	else if (key == sf::Keyboard::Down && !isStarted && (introCount == 4))
+	{
+		introCount = 5;
+		introSprite.setTexture(Intro5);
+	}
+	else if (key == sf::Keyboard::Up && !isStarted && (introCount == 5))
+	{
+
+		IntroTheme.stop();
+		BattleTheme.play(Music::BattleTheme);
+		isStarted = true;
+		clock.restart();
+	}
+}
+
+void Game::handlePlayerOption()
+{
+	sf::Event event;
+	while (mWindow.pollEvent(event))
+	{
+		switch (event.type)
+		{
+		case sf::Event::KeyPressed:
+			handlePlayerInput(event.key.code, true);
+			break;
+		case sf::Event::Closed:
+			mWindow.close();
+			break;
+		}
+	}
 }

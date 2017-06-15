@@ -12,7 +12,9 @@ namespace
 	const std::vector<AircraftData> Table = initializeAircraftData();
 }
 
-Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts,SoundHolder& mSounds, bool isPlayer)
+Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds
+	, bool isPlayer
+	, Player* player)
 	: Entity(Table[type].hitpoints)
 	, mType(type)
 	, mSprite(textures.get(Table[type].texture))
@@ -29,11 +31,13 @@ Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& tex
 	, mDropPickupCommand()
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
-	, mPoints(1000)
-	, isPlayerAircraft(isPlayer)
+	, mPoints(0)
 	, mMenu(window)
 	, FireRateCost(10)
 	, FireSpreadCost(15)
+	, mWindow(window)
+	, isPlayerAircraft(isPlayer)
+	, mOrigin(textures.get(Table[type].texture))
 {
 	centerOrigin(mSprite);
 
@@ -49,10 +53,19 @@ Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& tex
 		createProjectile(node, Projectile::Missile, 0.f, 0.5f, textures);
 	};
 
+	if (isPlayer)
+	{
+		mDamaged.loadFromFile("Media/Textures/EagleDamaged.png");
+		mPlayer = player;
+//		mPlayer->asignAircraft();
+	}
+
 }
 
 void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
+
+
 	if (isPlayerAircraft)
 	{
 		mMenu.showMenu();
@@ -63,13 +76,30 @@ void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 
 void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
+	float y = getPosition().y;
+
+	if (isPlayerAircraft)
+	{
+		mMenu.updateMenu(getPosition(), getHitpoints(), mPoints, mMissileAmmo, FireRateCost, FireSpreadCost);
+
+		if (getHitpoints() <= 0)
+		{
+			mPlayer->setPlayerDead();
+			bool t=mPlayer->isPlayerAlive();
+
+			mMenu.closeMenus();
+			mSprite.setTexture(mDamaged);
+
+		}
+	}
+
 
 	// Entity has been destroyed: Possibly drop pickup, mark for removal
 	if (isDestroyed())
 	{
-//		checkPickupDrop(commands);
-
-		mIsMarkedForRemoval = true;
+//		checkPickupDrop(commands);	
+		if(!isPlayerAircraft)
+			mIsMarkedForRemoval = true;
 		return;
 	}
 
@@ -82,11 +112,7 @@ void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 	// Update texts
 //	updateTexts();
-	if (isPlayerAircraft)
-	{
-		mMenu.updateMenu(getPosition(), getHitpoints(), mPoints, mMissileAmmo,FireRateCost,FireSpreadCost);
 
-	}
 
 }
 
@@ -306,6 +332,11 @@ void Aircraft::setAllyVelocity(float x,float y)
 //	this->mch
 }
 
+int Aircraft::getScore()
+{
+	return mScore;
+}
+
 void Aircraft::GetMissileORUpgradeFire()
 {
 	if (mMenu.isEOpened())
@@ -379,3 +410,31 @@ void Aircraft::addPoints(int points)
 {
 	mPoints += points;
 }
+
+void Aircraft::updateScore(int scores)
+{
+	mScore = scores;
+}
+
+bool Aircraft::reborn()
+{
+	if (mScore >=500&& getHitpoints() <= 0)
+	{
+		mPlayer->setPlayerAlive();
+		repair(60);
+		mScore -= 500;
+		mSprite.setTexture(mOrigin);
+		return true;
+	}
+	return false;
+}
+
+void Aircraft::restart()
+{
+	if (getHitpoints() <= 0)
+	{
+		mPlayer->restart();
+	}
+
+}
+

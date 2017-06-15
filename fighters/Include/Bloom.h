@@ -15,7 +15,6 @@ public:
 private:
 	void						initialize();
 	void						drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const ;		//!!!!!!!!!在调用 mWindow.draw(SceneNode) 时，此函数实现绘图!!!!!!!!!
-	typedef						std::array<sf::RenderTexture, 2> RenderTextureArray;
 	std::vector<sf::Texture>	bloomTextures;
 
 	sf::Sprite	mSprite;

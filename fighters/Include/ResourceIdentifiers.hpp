@@ -31,8 +31,10 @@ namespace Music
 {
 	enum ID
 	{
+		IntroTheme,
 		BattleTheme,
-		DefeatedTheme
+		DefeatedTheme,
+		PauseTheme,
 	};
 }
 

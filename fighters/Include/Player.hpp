@@ -2,6 +2,7 @@
 #define BOOK_PLAYER_HPP
 
 #include "Command.hpp"
+#include"Aircraft.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -42,15 +43,22 @@ class Player
 		void					assignKey(Action action, sf::Keyboard::Key key);
 		sf::Keyboard::Key		getAssignedKey(Action action) const;
 
-
+		bool					isPlayerAlive();
+		void					setPlayerDead();
+		void					setPlayerAlive();
+		void					gameContinue();
+		void					restart();
+		Aircraft*                               mAircraft;
 	private:
 		void					initializeActions();
 		static bool				isRealtimeAction(Action action);
 
 
 	private:
+		bool									playerAlive;
 		std::map<sf::Keyboard::Key, Action>		mKeyBinding;
 		std::map<Action, Command>				mActionBinding;
+
 };
 
 #endif // BOOK_PLAYER_HPP

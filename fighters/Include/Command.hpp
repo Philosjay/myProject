@@ -8,12 +8,14 @@
 
 
 class SceneNode;
+class Player;
 
 struct Command
 {
 												Command();
 
 	std::function<void(SceneNode&, sf::Time)>	action;
+	std::function<void(Player&, sf::Time)>		option;
 	unsigned int								category;
 };
 
@@ -29,5 +31,6 @@ std::function<void(SceneNode&, sf::Time)> derivedAction(Function fn)
 		fn(static_cast<GameObject&>(node), dt);
 	};
 }
+
 
 #endif // BOOK_COMMAND_HPP

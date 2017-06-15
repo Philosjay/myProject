@@ -4,10 +4,12 @@
 MusicPlayer::MusicPlayer()
 : mMusic()
 , mFilenames()
-, mVolume(50.f)
+, mVolume(30.f)
 {
 	mFilenames[Music::BattleTheme]    = "Media/Music/SovietCombat1.ogg";
-	mFilenames[Music::DefeatedTheme] = "Media/Music/MissionTheme.ogg";
+	mFilenames[Music::DefeatedTheme] = "Media/Music/Celebration.ogg";
+	mFilenames[Music::IntroTheme] = "Media/Music/Threatened in Mainland Europe.ogg";
+	mFilenames[Music::PauseTheme] = "Media/Music/Exploring in Mainland Europe.ogg";
 }
 
 void MusicPlayer::play(Music::ID theme)

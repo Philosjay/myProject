@@ -9,10 +9,11 @@
 #include "Command.hpp"
 #include"CommandQueue.hpp"
 #include "PlayerStatusMenu.h"
+#include"Player.hpp"
 
 #include<SFML/Graphics.hpp>
 
-
+class Player;
 
 class Aircraft : public Entity
 {
@@ -23,14 +24,32 @@ public:
 		Raptor,
 		Avenger,
 
-		RaptorTroopA,
-		RaptorTroopB,
+		RaptorA1,
+		RaptorA2,
+		RaptorB1,
+		RaptorB2,
+		RaptorC1,
+		RaptorC2,
+
+		AvengerA1,
+		AvengerA2,
+		AvengerB1,
+		AvengerB2,
+		AvengerC1,
+		AvengerC2,
+
+
+
+		EagleA1,
+		EagleA2,
+
 		TypeCount,
 	};
 
 
 public:
-	Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds,bool isPlayer);
+	Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& textures, const FontHolder& fonts, SoundHolder& mSounds
+			,bool isPlayer=false,Player* player=NULL);
 	virtual unsigned int	getCategory() const;
 	Aircraft::Type			getType() const;
 	virtual sf::FloatRect	getBoundingRect() const;
@@ -52,7 +71,10 @@ public:
 
 	void					closeMenu();
 	void					addPoints(int points);
-
+	void					updateScore(int scores);
+	bool					reborn();
+	void					restart();
+	int						getScore();
 
 private:
 	virtual void			drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -64,12 +86,16 @@ private:
 	void					createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, const TextureHolder& textures) const;
 	void					setAllyVelocity(float x, float y);
 
+
 private:
 	Type					mType;
 	sf::Sprite				mSprite;
+	sf::Texture				mDamaged;
+	sf::Texture				mOrigin;
 	Command 				mFireCommand;
 	Command					mMissileCommand;
 	SoundHolder&			mSounds;
+	sf::RenderWindow&       mWindow;
 
 	sf::Time				mFireCountdown;
 	bool 					mIsFiring;
@@ -81,6 +107,7 @@ private:
 	int						mSpreadLevel;
 	int						mMissileAmmo;
 	int						mPoints;
+	int						mScore;
 
 	int						FireRateCost;
 	int						FireSpreadCost;
@@ -91,6 +118,7 @@ private:
 
 
 	PlayerStatusMenu		mMenu;
+	Player*					mPlayer;
 
 };
 

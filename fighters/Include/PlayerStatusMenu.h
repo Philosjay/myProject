@@ -1,7 +1,10 @@
 #ifndef PLAYERSTATUSMENU_H_
 #define PLAYERSTATUSMENU_H_
 
+
 #include<SFML/Graphics.hpp>
+
+class Aircraft;
 
 class PlayerStatusMenu
 {

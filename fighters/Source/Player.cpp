@@ -25,6 +25,8 @@ struct AircraftMover
 };
 
 Player::Player()
+	:playerAlive(true)
+
 //	: mCurrentMissionStatus(MissionRunning)
 {
 	// Set initial key bindings
@@ -89,6 +91,32 @@ void Player::assignKey(Action action, sf::Keyboard::Key key)
 	mKeyBinding[key] = action;
 }
 
+bool Player::isPlayerAlive()
+{
+	return playerAlive;
+}
+
+void Player::setPlayerDead()
+{
+	playerAlive = false;
+}
+
+void Player::setPlayerAlive()
+{
+	playerAlive = true;
+}
+
+void Player::gameContinue()
+{
+	if (mAircraft->reborn());
+
+}
+
+void Player::restart()
+{
+
+}
+
 sf::Keyboard::Key Player::getAssignedKey(Action action) const
 {
 	FOREACH(auto pair, mKeyBinding)
@@ -115,6 +143,8 @@ void Player::initializeActions()		//载入函数，将commands与对应函数关联
 	mActionBinding[GetMissileORUpgradeFire].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetMissileORUpgradeFire(); });
 	mActionBinding[GetHpOrFirePile].action= derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.GetHpOrFirePile(); });
 
+	mActionBinding[Continue].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.reborn(); });
+	mActionBinding[Restart].action = derivedAction<Aircraft>([](Aircraft& a, sf::Time) {a.restart(); });
 }
 
 bool Player::isRealtimeAction(Action action)

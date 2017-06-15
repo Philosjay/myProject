@@ -1,6 +1,8 @@
 #include "Include\World.hpp"
 #include"Include\Projectile.hpp"
 #include "Include\Foreach.hpp"
+#include"Include\Player.hpp"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 
 
@@ -10,7 +12,7 @@
 
 bool matchesCategories(SceneNode::Pair& colliders, Category::Type type1, Category::Type type2);
 
-World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPlayerAlive)
+World::World(sf::RenderWindow& window, int& mScore, sf::Time* mTime, Player* player)
 	: mWindow(window)
 	, mWorldView(window.getDefaultView())
 	, mFonts(mFonts)
@@ -18,7 +20,7 @@ World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPla
 	, mTextures()
 	, mSceneGraph()
 	, mSceneLayers()
-	, mWorldBounds(0.f, 0.f, mWorldView.getSize().x, 8000.f)
+	, mWorldBounds(0.f, 0.f, mWorldView.getSize().x, 16000.f)
 	, mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.height - mWorldView.getSize().y / 2.f)
 	, mViewCenter(mSpawnPosition)
 	, mScrollSpeed(-50.f)
@@ -29,10 +31,9 @@ World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPla
 	, mRandomEvents(sf::seconds(5), sf::seconds(10), sf::seconds(0))
 	, mScore(mScore)
 	, mTime(mTime)
-	, mPlayer(mPlayerAircraft)
 	, mBloomNode()
-	, mBloom(NULL)
-	, isPlayerAlive(isPlayerAlive)
+//	, mBloom(NULL)
+	, mPlayer(player)
 {
 	loadTextures();
 	buildScene();
@@ -43,13 +44,10 @@ World::World(sf::RenderWindow& window, int* mScore, sf::Time* mTime, bool& isPla
 
 void World::update(sf::Time dt)
 {
-
-//	mPlayerAircraft->resetMenu();
-
 	// Scroll the world, reset player velocity
 	mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
 	mViewCenter.y -= mScrollSpeed * dt.asSeconds();
-	randomEvents(dt);
+//	randomEvents(dt);
 
 	mPlayerAircraft->setVelocity(0.f, 0.f);
 
@@ -87,7 +85,7 @@ void World::update(sf::Time dt)
 //	mBloomNode.removeBlooms();
 
 
-
+	mScore = mPlayerAircraft->getScore();
 	
 }
 
@@ -196,7 +194,7 @@ void World::buildScene()
 	mSceneLayers[Background]->attachChild(std::move(backgroundSprite));
 
 	// Add player's aircraft
-	std::unique_ptr<Aircraft> player(new Aircraft(mWindow,Aircraft::Eagle, mTextures, mFonts,mSounds,true));
+	std::unique_ptr<Aircraft> player(new Aircraft(mWindow,Aircraft::Eagle, mTextures, mFonts,mSounds,true,mPlayer));
 	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
 	mSceneLayers[Air]->attachChild(std::move(player));
@@ -209,19 +207,15 @@ void World::buildScene()
 void World::addEnemies()
 {
 	// Add enemies to the spawn point container
-	addEnemy(Aircraft::Raptor, 0.f, 500.f);
-	addEnemy(Aircraft::Raptor, 0.f, 700.f);
-	addEnemy(Aircraft::Raptor, 0.f, 700.f);
-	addEnemy(Aircraft::Raptor, 0.f, 1000.f);
-//	addEnemy(Aircraft::Raptor, +100.f, 1500.f);
-//	addEnemy(Aircraft::Raptor, -100.f, 1500.f);
-//	addEnemy(Aircraft::Avenger, -70.f, 1800.f);
-//	addEnemy(Aircraft::Avenger, -70.f, 2000.f);
-//	addEnemy(Aircraft::Avenger, 70.f, 1400.f);
-//	addEnemy(Aircraft::Avenger, 70.f, 1600.f);
+//	addEnemy(Aircraft::Raptor, 0.f, 500.f);
+//	addEnemy(Aircraft::Raptor, 0.f, 700.f);
+//	addEnemy(Aircraft::Raptor, 0.f, 700.f);
+//	addEnemy(Aircraft::Raptor, 0.f, 1000.f);
 
-	addTroopA(2000);
-	addTroopB(2000);
+
+//	addTroopD(1000);
+
+	addTroopD1();
 
 	addEnemy(Aircraft::Raptor, +300.f, 2000.f);
 	addEnemy(Aircraft::Raptor, -300.f, 2000.f);
@@ -239,6 +233,15 @@ void World::addEnemies()
 	addEnemy(Aircraft::Avenger, +140.f, 3600.f);
 	addEnemy(Aircraft::Avenger, -140.f, 3600.f);
 
+	addEnemy(Aircraft::Raptor, +100.f, 4500.f);
+	addEnemy(Aircraft::Raptor, -100.f, 4500.f);
+	addEnemy(Aircraft::Avenger, -70.f, 4800.f);
+	addEnemy(Aircraft::Avenger, -70.f, 5000.f);
+	addEnemy(Aircraft::Avenger, 70.f, 5400.f);
+	addEnemy(Aircraft::Avenger, 70.f, 5600.f);
+
+
+
 	// Sort all enemies according to their y value, such that lower enemies are checked first for spawning
 	std::sort(mEnemySpawnPoints.begin(), mEnemySpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)
 	{
@@ -246,37 +249,126 @@ void World::addEnemies()
 	});
 }
 
-void World::addTroopA()
+void World::addTroopA1(float y)
 {
 	for (int i = 0; i < 6; i++)
 	{
-		addEnemy(Aircraft::RaptorTroopA,100+i*30, mViewCenter.y + 500+i*20);
+		addEnemy(Aircraft::RaptorA1,100  + i * 50, y + i * 15);
 	}
 }
 
-void World::addTroopB()
+void World::addTroopA2(float y)
 {
 	for (int i = 0; i < 6; i++)
 	{
-		addEnemy(Aircraft::RaptorTroopB, -100 - i * 30, mViewCenter.y + 500 + i * 20);
+		addEnemy(Aircraft::RaptorA2, -100 - i * 50, y + i * 15);
 	}
 }
 
-void World::addTroopA(float y)
+void World::addTroopA1()
 {
 	for (int i = 0; i < 6; i++)
 	{
-		addEnemy(Aircraft::RaptorTroopA, 100 + i * 30, y + i * 20);
+		addEnemy(Aircraft::RaptorA1,100+i*50, mViewCenter.y + 500 + i*15);
 	}
 }
 
-void World::addTroopB(float y)
+void World::addTroopA2()
 {
 	for (int i = 0; i < 6; i++)
 	{
-		addEnemy(Aircraft::RaptorTroopB, -100 - i * 30, y + i * 20);
+		addEnemy(Aircraft::RaptorA2, -100 - i * 50, mViewCenter.y + 500 + i * 15);
 	}
 }
+
+void World::addTroopB1()
+{
+	addEnemy(Aircraft::RaptorA1, 100 + 1 * 50, mViewCenter.y + 500);
+	addEnemy(Aircraft::RaptorA1, 100 + 3 * 50, mViewCenter.y + 500);
+	addEnemy(Aircraft::AvengerA1, 100 + 2 * 30, mViewCenter.y + 500 + 40);
+}
+
+void World::addTroopB2()
+{
+	addEnemy(Aircraft::RaptorA2, -100 - 1 * 50, mViewCenter.y+500);
+	addEnemy(Aircraft::RaptorA2, -100 - 3 * 50, mViewCenter.y+500);
+	addEnemy(Aircraft::AvengerA2, -100 - 2 * 30, mViewCenter.y + 500+40);
+}
+
+void World::addTroopC1()
+{	
+	addEnemy(Aircraft::RaptorB1, 50 + 0 * 50, mViewCenter.y + 500+40);
+	addEnemy(Aircraft::RaptorB1, 50 + 2 * 50, mViewCenter.y + 500);
+	addEnemy(Aircraft::RaptorB1, 50 + 4 * 50, mViewCenter.y + 500+40);
+
+	addEnemy(Aircraft::AvengerB1, 50 - 1 * 50, mViewCenter.y + 500 + 100);
+	addEnemy(Aircraft::AvengerB1, 50 + 2 * 50, mViewCenter.y + 500+70);
+	addEnemy(Aircraft::AvengerB1, 50 + 5 * 50, mViewCenter.y + 500 + 100);
+}
+
+void World::addTroopC2()
+{
+	addEnemy(Aircraft::RaptorB1, -50 - 0 * 50, mViewCenter.y + 500 + 40);
+	addEnemy(Aircraft::RaptorB1, -50 - 2 * 50, mViewCenter.y + 500);
+	addEnemy(Aircraft::RaptorB1, -50 - 4 * 50, mViewCenter.y + 500 + 40);
+
+	addEnemy(Aircraft::AvengerB1, -50 + 1 * 50, mViewCenter.y + 500 + 100);
+	addEnemy(Aircraft::AvengerB1, -50 - 2 * 50, mViewCenter.y + 500 + 70);
+	addEnemy(Aircraft::AvengerB1, -50 - 5 * 50, mViewCenter.y + 500 + 100);
+}
+
+void World::addTroopD1()
+{
+	addEnemy(Aircraft::RaptorC1, 0 , mViewCenter.y + 500 + 30);
+	addEnemy(Aircraft::RaptorC1, 0 , mViewCenter.y + 500);
+	addEnemy(Aircraft::RaptorC1, 0 , mViewCenter.y + 500 + 60);
+
+	addEnemy(Aircraft::AvengerC1, 50 + 1 * 25, mViewCenter.y + 500 + 90);
+	addEnemy(Aircraft::AvengerC1, 50 + 3 * 25, mViewCenter.y + 500 + 50);
+	addEnemy(Aircraft::AvengerC1, 50 + 5 * 25, mViewCenter.y + 500 + 10);
+
+	addEnemy(Aircraft::AvengerC2, -50 - 1 * 25, mViewCenter.y + 500 + 90);
+	addEnemy(Aircraft::AvengerC2, -50 - 3 * 25, mViewCenter.y + 500 + 50);
+	addEnemy(Aircraft::AvengerC2, -50 - 5 * 25, mViewCenter.y + 500 + 10);
+}
+
+void World::addTroopB1(float y)
+{
+	addEnemy(Aircraft::RaptorA1, 100 + 1 * 50, y );
+	addEnemy(Aircraft::RaptorA1, 100 + 3 * 50, y );
+	addEnemy(Aircraft::AvengerA1, 100 + 2 * 37, y + 25);		//x+2*38,y+25不要更改
+}
+
+void World::addTroopB2(float y)
+{
+	addEnemy(Aircraft::RaptorA2, -100 - 1 * 50, y);
+	addEnemy(Aircraft::RaptorA2, -100 - 3 * 50, y);
+	addEnemy(Aircraft::AvengerA2, -100 - 2 * 37, y + 25);		//y+25不要更改
+}
+
+void World::addTroopC1(float y)
+{
+	addEnemy(Aircraft::RaptorB1, 50 + 0 * 50, y + 40);
+	addEnemy(Aircraft::RaptorB1, 50 + 2 * 50, y);
+	addEnemy(Aircraft::RaptorB1, 50 + 4 * 50, y + 40);
+
+	addEnemy(Aircraft::AvengerB1, 50 - 1 * 50, y + 100);
+	addEnemy(Aircraft::AvengerB1, 50 + 2 * 50, y + 70);
+	addEnemy(Aircraft::AvengerB1, 50 + 5 * 50, y + 100);
+}
+
+void World::addTroopC2(float y)
+{
+	addEnemy(Aircraft::RaptorB1, -50 - 0 * 50, y + 40);
+	addEnemy(Aircraft::RaptorB1, -50 - 2 * 50, y);
+	addEnemy(Aircraft::RaptorB1, -50 - 4 * 50, y + 40);
+
+	addEnemy(Aircraft::AvengerB1, -50 + 1 * 50, y + 100);
+	addEnemy(Aircraft::AvengerB1, -50 - 2 * 50, y + 70);
+	addEnemy(Aircraft::AvengerB1, -50 - 5 * 50, y + 100);
+}
+
+
 
 void World::addEnemy(Aircraft::Type type, float relX, float relY)
 {
@@ -288,7 +380,7 @@ void World::spawnEnemies()
 {
 	// Spawn all enemies entering the view area (including distance) this frame
 	while (!mEnemySpawnPoints.empty()
-		&& mEnemySpawnPoints.back().y > getBattlefieldBounds().top)
+		&& mEnemySpawnPoints.back().y > getBattlefieldBounds().top+20)
 	{
 		SpawnPoint spawn = mEnemySpawnPoints.back();
 
@@ -400,17 +492,7 @@ void World::handleCollisions()
 			}
 			
 		}
-/*
-		else if (matchesCategories(pair, Category::PlayerAircraft, Category::Pickup))
-		{
-			auto& player = static_cast<Aircraft&>(*pair.first);
-			auto& pickup = static_cast<Pickup&>(*pair.second);
 
-			// Apply pickup effect to player, destroy projectile
-			pickup.apply(player);
-			pickup.destroy();
-		}
-*/
 		else if (matchesCategories(pair, Category::EnemyAircraft, Category::AlliedProjectile)
 			|| matchesCategories(pair, Category::PlayerAircraft, Category::EnemyProjectile))
 		{
@@ -426,11 +508,6 @@ void World::handleCollisions()
 			updateScore(aircraft);
 		}
 	}
-	if (mPlayerAircraft->getHitpoints() <= 0 && isPlayerAlive)
-	{
-		isPlayerAlive = false;
-		addBloom(mPlayerAircraft->getPosition().x, mPlayerAircraft->getPosition().y);
-	}
 }
 
 void World::randomEvents(sf::Time dt)
@@ -443,18 +520,64 @@ void World::randomEnemys(sf::Time dt)
 	mRandomEvents.RandomEventsCountdown += dt;
 	if (mRandomEvents.RandomEventsCountdown > mRandomEvents.RandomEnemyInterval)
 	{
-		if (rand() % 3 == 1)
+//		addTroopC();
+		int Rand = rand();
+
+		if (Rand % 6 == 0)
 		{
-			addEnemy(Aircraft::Avenger, rand() % 600 - 300, mViewCenter.y + 500);
+			int Rand = rand();
+			if (Rand % 3 == 0)
+			{
+				if (rand() % 2 == 0)
+				{
+					addTroopA1();
+				}
+				else
+				{
+					addTroopA2();
+				}
+			}
+			else
+			{
+				if (rand() % 2 == 0)
+				{
+					addTroopB1();
+				}
+				else
+				{
+					addTroopB2();
+				}
+			}
+		}
+		else if(Rand%6>2)
+		{
+			addEnemy(Aircraft::Raptor, rand() % 600 - 300, mViewCenter.y + 500);
 		}
 		else
 		{
-			addEnemy(Aircraft::Raptor, rand() % 600 - 300, mViewCenter.y + 500);
+			addEnemy(Aircraft::Avenger, rand() % 600 - 300, mViewCenter.y + 500);
 		}
 		
 
 		mRandomEvents.RandomEventsCountdown -= mRandomEvents.RandomEnemyInterval;
+
+		if (rand() % 3 == 0)
+		{
+//			mRandomEvents.RandomEnemyInterval -= sf::seconds(0.5);
+		}
+
+		std::sort(mEnemySpawnPoints.begin(), mEnemySpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)	//加入随机敌机后，给飞机队列排序，满足World::spawnEnemies 需求
+		{
+			return lhs.y < rhs.y;
+		});
 	}
+
+
+}
+
+void World::randomTroop(sf::Time dt)
+{
+
 }
 
 void World::updateScore(Aircraft& mAircraft)
@@ -464,20 +587,22 @@ void World::updateScore(Aircraft& mAircraft)
 		switch (mAircraft.getType())
 		{
 		case Aircraft::Type::Raptor:
-		case Aircraft::Type::RaptorTroopA:
-		case Aircraft::Type::RaptorTroopB:
-			*mScore += 50;
+		case Aircraft::Type::RaptorA1:
+		case Aircraft::Type::RaptorA2:
+			mScore += 50;
 			mPlayerAircraft->addPoints(1);
 			break;
 		case Aircraft::Type::Avenger:
-			*mScore += 100;
+			mScore += 100;
 			mPlayerAircraft->addPoints(4);
 			break;
 		case Aircraft::Type::Eagle:
-			*mScore += 150;
+			mScore += 150;
 			mPlayerAircraft->addPoints(7);
 			break;
 		}
+		mSounds.play(SoundEffect::Explosion2);
+		mPlayerAircraft->updateScore(mScore);
 		addBloom(mAircraft.getPosition().x, mAircraft.getPosition().y);
 	}
 
@@ -521,4 +646,9 @@ void World :: addBloom(float x,float y)
 
 
 
+}
+
+sf::Vector2f World::getViewCenter()
+{
+	return  mSpawnPosition- mViewCenter;
 }
