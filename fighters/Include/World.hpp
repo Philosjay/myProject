@@ -8,8 +8,8 @@
 #include "Aircraft.hpp"
 #include "Command.hpp"
 #include "CommandQueue.hpp"
-#include"SoundHolder.hpp"
-#include"Bloom.h"
+#include "SoundHolder.hpp"
+#include "Flash.h"
 
 
 #include <SFML/System/NonCopyable.hpp>
@@ -52,6 +52,7 @@ private:
 	void								addEnemies();
 
 																//基于当前位置
+																//标号为1 向左，2向右
 	void								addTroopA1();		
 	void								addTroopA2();
 	void								addTroopB1();
@@ -59,7 +60,12 @@ private:
 	void								addTroopC1();
 	void								addTroopC2();
 	void								addTroopD1();
-
+	void								addTroopE1();
+	void								addTroopE2();
+	void								addEagleA1();
+	void								addEagleA2();
+	void								addEagleB1();
+	void								addEagleB2();
 																//基于预设坐标
 	void								addTroopA1(float y);		//一列raptor
 	void								addTroopA2(float y);
@@ -67,7 +73,13 @@ private:
 	void								addTroopB2(float y);
 	void								addTroopC1(float y);		//3 raptor + 3 avenger
 	void								addTroopC2(float y);
-
+	void								addTroopD1(float y);
+	void								addTroopE1(float y);
+	void								addTroopE2(float y);
+	void								addEagleA1(float y);
+	void								addEagleA2(float y);
+	void								addEagleB1(float y);
+	void								addEagleB2(float y);
 
 	void								addEnemy(Aircraft::Type type, float relX, float relY);
 	void								spawnEnemies();
@@ -77,7 +89,7 @@ private:
 	sf::FloatRect						getBattlefieldBounds() const;
 	void								updateScore(Aircraft& mAircraft);
 	void								addAlly();
-	void								addBloom(float x, float y);
+	void								addFlash(Textures::ID type,float x, float y);
 
 
 private:
@@ -142,8 +154,7 @@ private:
 
 	int&								mScore;
 	sf::Time*							mTime;
-	SceneNode							mBloomNode;
-//	Bloom*								mBloom;
+	SceneNode							mFlashNode;
 	sf::Sprite							bm;
 	Player*								mPlayer;
 

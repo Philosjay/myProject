@@ -56,7 +56,8 @@ namespace Textures
 		ButtonNormal,
 		ButtonSelected,
 		ButtonPressed,
-		Explosion
+		Explosion,
+		Spark,
 	};
 }
 

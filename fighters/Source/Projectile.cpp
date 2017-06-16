@@ -39,7 +39,7 @@ void Projectile::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (isGuided())
 	{
-		const float approachRate = 200.f;
+		const float approachRate = 300.f;		//×·×Ù²ÎÊý
 
 		sf::Vector2f newVelocity = unitVector(approachRate * dt.asSeconds() * mTargetDirection + getVelocity());
 		newVelocity *= getMaxSpeed();

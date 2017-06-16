@@ -3,6 +3,7 @@
 Entity::Entity(int hitpoints)
 	: mVelocity()
 	, mHitpoints(hitpoints)
+	, mMaxHP(hitpoints)
 {
 }
 
@@ -40,12 +41,19 @@ int Entity::getHitpoints() const
 	return mHitpoints;
 }
 
+void Entity::increaseHP(int increase)
+{
+	mHitpoints += increase;
+}
+
 
 void Entity::repair(int points)
 {
 	//	assert(points > 0);
-
 	mHitpoints += points;
+
+	if (mHitpoints > mMaxHP) mHitpoints = mMaxHP;
+
 }
 
 void Entity::damage(int points)

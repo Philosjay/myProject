@@ -36,6 +36,11 @@ Game::Game()
 	Intro4.loadFromFile("Media/Textures/intro4.png");
 	Intro5.loadFromFile("Media/Textures/intro5.png");
 
+	Intro1.setRepeated(true);
+	Intro2.setRepeated(true);
+	Intro3.setRepeated(true);
+	Intro4.setRepeated(true);
+
 	introSprite.setTexture(Intro1);
 	introSprite.setPosition(0, 0);
 }

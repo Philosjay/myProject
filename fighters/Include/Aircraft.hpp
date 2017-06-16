@@ -30,6 +30,9 @@ public:
 		RaptorB2,
 		RaptorC1,
 		RaptorC2,
+		RaptorD1,
+		RaptorD2,
+
 
 		AvengerA1,
 		AvengerA2,
@@ -37,11 +40,15 @@ public:
 		AvengerB2,
 		AvengerC1,
 		AvengerC2,
+		AvengerD1,
+		AvengerD2,
 
 
 
 		EagleA1,
 		EagleA2,
+		EagleB1,
+		EagleB2,
 
 		TypeCount,
 	};

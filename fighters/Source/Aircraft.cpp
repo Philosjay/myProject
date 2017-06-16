@@ -76,7 +76,7 @@ void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 
 void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
-	float y = getPosition().y;
+
 
 	if (isPlayerAircraft)
 	{
@@ -130,10 +130,52 @@ Aircraft::Type Aircraft::getType() const
 	{
 	case Type::Raptor:
 		return Type::Raptor;
+	case Type::RaptorA1:
+		return Type::RaptorA1;
+	case Type::RaptorA2:
+		return Type::RaptorA2;
+	case Type::RaptorB1:
+		return Type::RaptorB1;
+	case Type::RaptorB2:
+		return Type::RaptorB2;
+	case Type::RaptorC1:
+		return Type::RaptorC1;
+	case Type::RaptorC2:
+		return Type::RaptorC2;
+	case Type::RaptorD1:
+		return Type::RaptorD1;
+	case Type::RaptorD2:
+		return Type::RaptorD2;
+
 	case Type::Avenger:
 		return Type::Avenger;
+	case Type::AvengerA1:
+		return Type::AvengerA1;
+	case Type::AvengerA2:
+		return Type::AvengerA2;
+	case Type::AvengerB1:
+		return Type::AvengerB1;
+	case Type::AvengerB2:
+		return Type::AvengerB2;
+	case Type::AvengerC1:
+		return Type::AvengerC1;
+	case Type::AvengerC2:
+		return Type::AvengerC2;
+	case Type::AvengerD1:
+		return Type::AvengerD1;
+	case Type::AvengerD2:
+		return Type::AvengerD2;
+
 	case Type::Eagle:
 		return Type::Eagle;
+	case Type::EagleA1:
+		return Type::EagleA1;
+	case Type::EagleA2:
+		return Type::EagleA2;
+	case Type::EagleB1:
+		return Type::EagleB1;
+	case Type::EagleB2:
+		return Type::EagleB2;
 	}
 }
 
@@ -161,7 +203,7 @@ bool Aircraft::increaseFireRate()
 {
 	if (mFireRateLevel < 7)
 	{
-		++mFireRateLevel;
+		mFireRateLevel+=0.5;
 		return true;
 	}
 	return false;
@@ -179,6 +221,7 @@ bool Aircraft::increaseSpread()
 
 
 }
+
 
 void Aircraft::collectMissiles(unsigned int count)
 {
@@ -230,6 +273,17 @@ void Aircraft::updateMovementPattern(sf::Time dt)
 		float vy = getMaxSpeed() * std::sin(radians);
 
 		setVelocity(vx, vy);
+
+		//满足addTroopE()的动作需求
+		if (getType() == Aircraft::RaptorD1 || getType() == Aircraft::RaptorD2|| getType() == Aircraft::AvengerD1 ||getType() == Aircraft::AvengerD2)
+		{
+			accelerate(0, -50);
+
+			if (radians == 0)
+			{
+				setVelocity(getMaxSpeed(), 0);
+			}
+		}
 
 		mTravelledDistance += getMaxSpeed() * dt.asSeconds();
 	}
@@ -357,7 +411,7 @@ void Aircraft::GetMissileORUpgradeFire()
 			{
 				mPoints -= FireRateCost;
 				mSounds.play(SoundEffect::Upgrade);
-				FireRateCost = FireRateCost / 5 + 3 + FireRateCost;		//升级所需点数增加
+				FireRateCost = FireRateCost / 3 + 5 + FireRateCost;		//升级所需点数增加
 			}
 				
 		}
@@ -368,7 +422,7 @@ void Aircraft::GetHpOrFirePile()
 {
 	if (mMenu.isEOpened())
 	{
-		if (mPoints - 5 >= 0)
+		if (mPoints - 5 >= 0&&getHitpoints()<100)
 		{
 			repair(20);
 			mPoints -= 5;
@@ -384,7 +438,7 @@ void Aircraft::GetHpOrFirePile()
 			{
 				mPoints -= FireSpreadCost;
 				mSounds.play(SoundEffect::Upgrade);
-				FireSpreadCost = FireSpreadCost / 5 + 4 + FireSpreadCost;
+				FireSpreadCost = FireSpreadCost*2 + 5;
 			}
 				
 		}

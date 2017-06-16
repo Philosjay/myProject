@@ -56,11 +56,11 @@ void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
 void SceneNode::update(sf::Time dt)
 {
 	FOREACH(Ptr& child, mChildren)
-		child->updateBloom(dt);
+		child->updateFlash(dt);
 
 }
 
-void SceneNode::updateBloom(sf::Time dt)
+void SceneNode::updateFlash(sf::Time dt)
 {
 //
 }
