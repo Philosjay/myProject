@@ -34,7 +34,7 @@ Aircraft::Aircraft(sf::RenderWindow& window, Type type, const TextureHolder& tex
 	, mPoints(0)
 	, mMenu(window)
 	, FireRateCost(10)
-	, FireSpreadCost(15)
+	, FireSpreadCost(20)
 	, mWindow(window)
 	, isPlayerAircraft(isPlayer)
 	, mOrigin(textures.get(Table[type].texture))
@@ -411,7 +411,7 @@ void Aircraft::GetMissileORUpgradeFire()
 			{
 				mPoints -= FireRateCost;
 				mSounds.play(SoundEffect::Upgrade);
-				FireRateCost = FireRateCost / 4 + 5 + FireRateCost;		//升级所需点数增加
+				FireRateCost = FireRateCost / 2 + 5 + FireRateCost;		//升级所需点数增加
 			}
 				
 		}
@@ -438,7 +438,7 @@ void Aircraft::GetHpOrFirePile()
 			{
 				mPoints -= FireSpreadCost;
 				mSounds.play(SoundEffect::Upgrade);
-				FireSpreadCost = FireSpreadCost/2 + 5+ FireSpreadCost;
+				FireSpreadCost = FireSpreadCost + 5+ FireSpreadCost;
 			}
 				
 		}

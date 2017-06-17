@@ -219,7 +219,7 @@ void World::buildScene()
 	mDownCloud->setPosition(mWorldBounds.left, mWorldBounds.top );
 	mSceneLayers[DownCloud]->attachChild(std::move(mDownCloud));
 
-	for (float y = 0; y < mWorldBounds.top + mWorldLength / 2- UpcloudsTexture.getSize().y; y += UpcloudsTexture.getSize().y)	//后半个关卡覆盖上层云
+	for (float y = 0; y < mWorldBounds.top + mWorldLength / 2- UpcloudsTexture.getSize().y/2; y += UpcloudsTexture.getSize().y)	//后半个关卡覆盖上层云
 	{
 		std::unique_ptr<SpriteNode> mUpCloud(new SpriteNode(UpcloudsTexture, textureRect));
 		mUpCloud->setPosition(mWorldBounds.left, y);
@@ -261,8 +261,8 @@ void World::updateScore(Aircraft& mAircraft)
 		case Aircraft::Type::RaptorC2:
 		case Aircraft::Type::RaptorD1:
 		case Aircraft::Type::RaptorD2:
-			mScore += 10;
-			mPlayerAircraft->addPoints(1);
+			mScore += mPlayer->RaptorScore;
+			mPlayerAircraft->addPoints(mPlayer->RaptorPoint);
 			break;
 		case Aircraft::Type::Avenger:
 		case Aircraft::Type::AvengerA1:
@@ -273,15 +273,15 @@ void World::updateScore(Aircraft& mAircraft)
 		case Aircraft::Type::AvengerC2:
 		case Aircraft::Type::AvengerD1:
 		case Aircraft::Type::AvengerD2:
-			mScore += 15;
-			mPlayerAircraft->addPoints(4);
+			mScore += mPlayer->AvengerScore;
+			mPlayerAircraft->addPoints(mPlayer->AvengerPoint);
 			break;
 		case Aircraft::Type::EagleA1:
 		case Aircraft::Type::EagleA2:
 		case Aircraft::Type::EagleB1:
 		case Aircraft::Type::EagleB2:
-			mScore += 40;
-			mPlayerAircraft->addPoints(10);
+			mScore += mPlayer->EagleScore;
+			mPlayerAircraft->addPoints(mPlayer->EaglePoint);
 			break;
 		}
 		mSounds.play(SoundEffect::Explosion2);
@@ -294,16 +294,15 @@ void World::updateScore(Aircraft& mAircraft)
 void World::addEnemies()
 {
 
+	addEagleA1(2000);
+	addEagleA1(4000);
+	addEagleB1(6000);
+	addEagleB1(8000);
 
-	addEagleA1(5000);
-	addEagleA2(8000);
-	addEagleB1(10000);
-	addEagleB2(18000);
-
-	addEagleA1(13000);
-	addEagleA2(15000);
-	addEagleB1(14000);
-	addEagleB2(16000);
+	addEagleA1(12000);
+	addEagleA1(14000);
+	addEagleB1(16000);
+	addEagleB1(18000);
 
 	
 	// Add enemies to the spawn point container
@@ -359,8 +358,58 @@ void World::addEnemies()
 
 
 
+	addEnemy(Aircraft::Raptor, 0.f, 500.f+9000);
+	addEnemy(Aircraft::Raptor, 0.f, 700.f + 9000);
+	addEnemy(Aircraft::Raptor, 0.f, 700.f + 9000);
+	addEnemy(Aircraft::Raptor, 0.f, 1000.f + 9000);
 
-	addTroopE2(5000 + 9000);
+
+	addTroopA1(1500 + 9000);
+
+
+	addEnemy(Aircraft::Raptor, +300.f, 2000.f + 9000);
+	addEnemy(Aircraft::Raptor, -300.f, 2000.f + 9000);
+	addEnemy(Aircraft::Raptor, 0.f, 2100.f + 9000);
+
+	addEnemy(Aircraft::Avenger, +140.f, 2600.f + 9000);
+	addEnemy(Aircraft::Avenger, -140.f, 2600.f + 9000);
+
+	addTroopA2(3000 + 9000);
+
+	addEnemy(Aircraft::Raptor, +200.f, 3300.f + 9000);
+	addEnemy(Aircraft::Raptor, -200.f, 3300.f + 9000);
+	addEnemy(Aircraft::Raptor, 0.f, 3500.f + 9000);
+	addEnemy(Aircraft::Avenger, +240.f, 3500.f + 9000);
+	addEnemy(Aircraft::Avenger, -240.f, 3500.f + 9000);
+	addEnemy(Aircraft::Raptor, +400.f, 3700.f + 9000);
+	addEnemy(Aircraft::Raptor, -400.f, 3700.f + 9000);
+	addEnemy(Aircraft::Raptor, 0.f, 3900.f + 9000);
+
+
+	addEnemy(Aircraft::Avenger, +70.f, 4500.f + 9000);
+	addEnemy(Aircraft::Avenger, -70.f, 4500.f + 9000);
+	addEnemy(Aircraft::Avenger, +140.f, 4700.f + 9000);
+	addEnemy(Aircraft::Avenger, -140.f, 4700.f + 9000);
+
+	addTroopE2(5500 + 9000);
+
+
+
+
+
+	addEnemy(Aircraft::Raptor, +100.f, 7000.f + 9000);
+	addEnemy(Aircraft::Raptor, -100.f, 7500.f + 9000);
+	addEnemy(Aircraft::Avenger, -70.f, 7800.f + 9000);
+
+
+	addTroopA1(8000 + 9000);
+	addTroopA2(8000 + 9000);
+
+
+	addTroopD1(9000 + 9000);
+
+
+	addTroopE2(5000 + 9000 + 9000);
 
 
 
@@ -795,12 +844,12 @@ void World::randomEnemys(sf::Time dt)
 	}
 	else if (mPlayerAircraft->getPosition().y < mWorldLength - 10000 && randomLevel == 2)
 	{
-		mRandomEvents.RandomEnemyInterval -= sf::seconds(0.3);
+		mRandomEvents.RandomEnemyInterval -= sf::seconds(0.4);
 		randomLevel++;
 	}
 	else if (mPlayerAircraft->getPosition().y < mWorldLength - 15000 && randomLevel == 3)
 	{
-		mRandomEvents.RandomEnemyInterval -= sf::seconds(0.3);
+		mRandomEvents.RandomEnemyInterval -= sf::seconds(0.5);
 		randomLevel++;
 	}
 

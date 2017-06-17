@@ -153,14 +153,17 @@ void Game::handleGameOutput()
 
 	if (mWorld->getViewCenter().y < mWorld->getWorldLength()/2 +1500 &&!BattleThemeShifted)
 	{
-		BattleTheme.setVolume(10);
-		if (mWorld->getViewCenter().y < mWorld->getWorldLength() / 2 + 1000 && !BattleThemeShifted)
-		{
-			BattleThemeShifted = true;
-			BattleTheme.setVolume(50);
-			BattleTheme.play(Music::BattleTheme2);
-		}
+		BattleTheme.setVolume(-50.f);
 
+			if (mWorld->getViewCenter().y < mWorld->getWorldLength() / 2 + 800 && !BattleThemeShifted)
+			{
+				BattleThemeShifted = true;
+				BattleTheme.setVolume(50);
+				BattleTheme.play(Music::BattleTheme2);
+			}
+
+
+		
 	}
 }
 
@@ -229,9 +232,9 @@ void Game::initialize()
 	mStatisticsText.setCharacterSize(30);
 
 	mGameOver.setFont(mFont);
-	mGameOver.setPosition(15.f, 320.f);
+	mGameOver.setPosition(15.f, 260.f);
 	mGameOver.setCharacterSize(40);
-	mGameOver.setString("Press SPACE KEY to restart...");
+	mGameOver.setString("     GAME OVER \n\n Press SPACE KEY to restart...");
 
 	mReborn.setFont(mFont);
 	mReborn.setPosition(15.f, 320.f);
@@ -239,7 +242,7 @@ void Game::initialize()
 	mReborn.setString("Press 1 KEY to reborn...\n (500 Score required)");
 
 
-	TimePerFrame = sf::seconds(1.f /45.f);
+	TimePerFrame = sf::seconds(1.f /60.f);
 
 
 	pauseSprite.setTexture(pauseTexture);

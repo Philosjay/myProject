@@ -26,6 +26,12 @@ struct AircraftMover
 
 Player::Player()
 	:playerAlive(true)
+	, RaptorPoint(1)
+	, AvengerPoint(4)
+	, EaglePoint(7)
+	, RaptorScore(10)
+	, AvengerScore(15)
+	, EagleScore(35)
 
 //	: mCurrentMissionStatus(MissionRunning)
 {

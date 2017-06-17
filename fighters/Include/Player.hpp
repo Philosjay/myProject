@@ -35,6 +35,13 @@ class Player
 
 
 	public:
+		int										RaptorPoint;
+		int										AvengerPoint;
+		int										EaglePoint;
+		int										RaptorScore;
+		int										AvengerScore;
+		int										EagleScore;
+
 								Player();
 
 								void					handleEvent(const sf::Event& event, CommandQueue& commands);
