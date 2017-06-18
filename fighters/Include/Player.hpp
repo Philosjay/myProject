@@ -24,7 +24,7 @@ class Player
 			Fire,
 			EMenu,
 			QMenu,
-			CloseMenu,
+			CloseMenuOrUpgradeMissileSlot,
 			GetMissileORUpgradeFire,
 			GetHpOrFirePile,
 			Restart,

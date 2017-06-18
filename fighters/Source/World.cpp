@@ -33,6 +33,7 @@ World::World(sf::RenderWindow& window, int& mScore, Player* player)
 	, mScore(mScore)
 	, mPlayer(player)
 {
+
 	srand(time(0));
 
 	loadTextures();
@@ -81,7 +82,7 @@ void World::update(sf::Time dt)
 	adaptPlayerPosition();
 	mSounds.emptyQueue();
 
-
+	
 	mFlashNode.update(dt);
 	mFlashNode.removeWrecks();		//移除过期Flash节点
 
@@ -360,8 +361,7 @@ void World::addEnemies()
 
 	addEnemy(Aircraft::Raptor, 0.f, 500.f+9000);
 	addEnemy(Aircraft::Raptor, 0.f, 700.f + 9000);
-	addEnemy(Aircraft::Raptor, 0.f, 700.f + 9000);
-	addEnemy(Aircraft::Raptor, 0.f, 1000.f + 9000);
+
 
 
 	addTroopA1(1500 + 9000);
@@ -371,25 +371,22 @@ void World::addEnemies()
 	addEnemy(Aircraft::Raptor, -300.f, 2000.f + 9000);
 	addEnemy(Aircraft::Raptor, 0.f, 2100.f + 9000);
 
-	addEnemy(Aircraft::Avenger, +140.f, 2600.f + 9000);
-	addEnemy(Aircraft::Avenger, -140.f, 2600.f + 9000);
+
 
 	addTroopA2(3000 + 9000);
 
-	addEnemy(Aircraft::Raptor, +200.f, 3300.f + 9000);
-	addEnemy(Aircraft::Raptor, -200.f, 3300.f + 9000);
+
 	addEnemy(Aircraft::Raptor, 0.f, 3500.f + 9000);
 	addEnemy(Aircraft::Avenger, +240.f, 3500.f + 9000);
 	addEnemy(Aircraft::Avenger, -240.f, 3500.f + 9000);
 	addEnemy(Aircraft::Raptor, +400.f, 3700.f + 9000);
-	addEnemy(Aircraft::Raptor, -400.f, 3700.f + 9000);
-	addEnemy(Aircraft::Raptor, 0.f, 3900.f + 9000);
 
 
-	addEnemy(Aircraft::Avenger, +70.f, 4500.f + 9000);
+
+
 	addEnemy(Aircraft::Avenger, -70.f, 4500.f + 9000);
 	addEnemy(Aircraft::Avenger, +140.f, 4700.f + 9000);
-	addEnemy(Aircraft::Avenger, -140.f, 4700.f + 9000);
+
 
 	addTroopE2(5500 + 9000);
 
